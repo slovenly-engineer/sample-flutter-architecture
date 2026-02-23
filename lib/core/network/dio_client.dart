@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'dio_client.g.dart';
 
 @riverpod
-Dio dioClient(DioClientRef ref) {
+Dio dioClient(Ref ref) {
   final dio = Dio(
     BaseOptions(
       baseUrl: 'https://jsonplaceholder.typicode.com',

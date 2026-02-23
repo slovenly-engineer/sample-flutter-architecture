@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/models/result.dart';
@@ -73,7 +74,7 @@ class TodoFilterNotifier extends _$TodoFilterNotifier {
 }
 
 @riverpod
-List<Todo> filteredTodos(FilteredTodosRef ref) {
+List<Todo> filteredTodos(Ref ref) {
   final todosAsync = ref.watch(todoListNotifierProvider);
   final filter = ref.watch(todoFilterNotifierProvider);
 
@@ -89,7 +90,7 @@ List<Todo> filteredTodos(FilteredTodosRef ref) {
 }
 
 @riverpod
-TodoStats todoStats(TodoStatsRef ref) {
+TodoStats todoStats(Ref ref) {
   final todosAsync = ref.watch(todoListNotifierProvider);
 
   return todosAsync.when(

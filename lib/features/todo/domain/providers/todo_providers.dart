@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/network/dio_client.dart';
@@ -15,13 +16,13 @@ part 'todo_providers.g.dart';
 // --- Data Layer Providers ---
 
 @riverpod
-TodoApi todoApi(TodoApiRef ref) {
+TodoApi todoApi(Ref ref) {
   final dio = ref.watch(dioClientProvider);
   return TodoApi(dio);
 }
 
 @riverpod
-TodoRepository todoRepository(TodoRepositoryRef ref) {
+TodoRepository todoRepository(Ref ref) {
   final api = ref.watch(todoApiProvider);
   return TodoRepositoryImpl(api: api);
 }
@@ -29,31 +30,31 @@ TodoRepository todoRepository(TodoRepositoryRef ref) {
 // --- Domain Layer Providers (UseCases) ---
 
 @riverpod
-GetTodosUseCase getTodosUseCase(GetTodosUseCaseRef ref) {
+GetTodosUseCase getTodosUseCase(Ref ref) {
   final repository = ref.watch(todoRepositoryProvider);
   return GetTodosUseCase(repository: repository);
 }
 
 @riverpod
-GetTodoDetailUseCase getTodoDetailUseCase(GetTodoDetailUseCaseRef ref) {
+GetTodoDetailUseCase getTodoDetailUseCase(Ref ref) {
   final repository = ref.watch(todoRepositoryProvider);
   return GetTodoDetailUseCase(repository: repository);
 }
 
 @riverpod
-ToggleTodoUseCase toggleTodoUseCase(ToggleTodoUseCaseRef ref) {
+ToggleTodoUseCase toggleTodoUseCase(Ref ref) {
   final repository = ref.watch(todoRepositoryProvider);
   return ToggleTodoUseCase(repository: repository);
 }
 
 @riverpod
-CreateTodoUseCase createTodoUseCase(CreateTodoUseCaseRef ref) {
+CreateTodoUseCase createTodoUseCase(Ref ref) {
   final repository = ref.watch(todoRepositoryProvider);
   return CreateTodoUseCase(repository: repository);
 }
 
 @riverpod
-DeleteTodoUseCase deleteTodoUseCase(DeleteTodoUseCaseRef ref) {
+DeleteTodoUseCase deleteTodoUseCase(Ref ref) {
   final repository = ref.watch(todoRepositoryProvider);
   return DeleteTodoUseCase(repository: repository);
 }

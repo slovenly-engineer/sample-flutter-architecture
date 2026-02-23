@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -7,7 +8,7 @@ import '../../features/todo/presentation/pages/todo_detail_page.dart';
 part 'router_provider.g.dart';
 
 @riverpod
-GoRouter router(RouterRef ref) {
+GoRouter router(Ref ref) {
   return GoRouter(
     initialLocation: '/',
     routes: [

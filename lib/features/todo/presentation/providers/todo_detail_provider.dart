@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/models/result.dart';
@@ -7,7 +8,7 @@ import '../../domain/providers/todo_providers.dart';
 part 'todo_detail_provider.g.dart';
 
 @riverpod
-Future<Todo> todoDetail(TodoDetailRef ref, int id) async {
+Future<Todo> todoDetail(Ref ref, int id) async {
   final useCase = ref.watch(getTodoDetailUseCaseProvider);
   final result = await useCase(id);
 
