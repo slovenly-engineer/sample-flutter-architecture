@@ -1,7 +1,7 @@
 import '../../../../core/models/api_error.dart';
 import '../../../../core/models/result.dart';
 import '../../models/todo.dart';
-import '../../data/repositories/todo_repository.dart';
+import '../repositories/todo_repository.dart';
 
 class GetTodoDetailUseCase {
   GetTodoDetailUseCase({required this.repository});

@@ -4,12 +4,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sample_flutter_architecture/core/models/api_error.dart';
 import 'package:sample_flutter_architecture/core/models/result.dart';
+import 'package:sample_flutter_architecture/core/infrastructure/navigation/app_navigator.dart';
+import 'package:sample_flutter_architecture/core/infrastructure/navigation/navigation_provider.dart';
 import 'package:sample_flutter_architecture/features/todo/domain/providers/todo_providers.dart';
 import 'package:sample_flutter_architecture/features/todo/models/todo.dart';
 import 'package:sample_flutter_architecture/features/todo/presentation/pages/todo_list_page.dart';
 
 import '../../../../helpers/mocks.dart';
 import '../../../../helpers/test_app.dart';
+
+class MockAppNavigator extends Mock implements AppNavigator {}
 
 void main() {
   setUpAll(() {
@@ -29,6 +33,8 @@ void main() {
     final mockCreate = MockCreateTodoUseCase();
     final mockDelete = MockDeleteTodoUseCase();
 
+    final mockNavigator = MockAppNavigator();
+
     return createTestApp(
       const TodoListPage(),
       overrides: [
@@ -36,6 +42,7 @@ void main() {
         toggleTodoUseCaseProvider.overrideWith((ref) => mockToggle),
         createTodoUseCaseProvider.overrideWith((ref) => mockCreate),
         deleteTodoUseCaseProvider.overrideWith((ref) => mockDelete),
+        appNavigatorProvider.overrideWith((ref) => mockNavigator),
       ],
     );
   }

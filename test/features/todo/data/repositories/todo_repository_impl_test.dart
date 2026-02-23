@@ -1,27 +1,24 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:sample_flutter_architecture/core/models/api_error.dart';
-import 'package:sample_flutter_architecture/features/todo/data/api/todo_api.dart';
+import 'package:sample_flutter_architecture/core/infrastructure/network/http_client_service.dart';
 import 'package:sample_flutter_architecture/features/todo/data/repositories/todo_repository_impl.dart';
 import 'package:sample_flutter_architecture/features/todo/models/todo.dart';
 
-class MockTodoApi extends Mock implements TodoApi {}
+class MockHttpClientService extends Mock implements HttpClientService {}
 
 void main() {
-  late MockTodoApi mockApi;
+  late MockHttpClientService mockHttp;
   late TodoRepositoryImpl repository;
 
   setUp(() {
-    mockApi = MockTodoApi();
-    repository = TodoRepositoryImpl(api: mockApi);
+    mockHttp = MockHttpClientService();
+    repository = TodoRepositoryImpl(mockHttp);
   });
 
-  setUpAll(() {
-    registerFallbackValue(
-      const Todo(id: 0, userId: 0, title: ''),
-    );
-    registerFallbackValue(<String, dynamic>{});
-  });
+  final testTodosJson = [
+    {'id': 1, 'userId': 1, 'title': 'Todo 1', 'completed': false},
+    {'id': 2, 'userId': 1, 'title': 'Todo 2', 'completed': true},
+  ];
 
   final testTodos = [
     const Todo(id: 1, userId: 1, title: 'Todo 1'),
@@ -30,7 +27,9 @@ void main() {
 
   group('getTodos', () {
     test('returns list of todos on success', () async {
-      when(() => mockApi.getTodos()).thenAnswer((_) async => testTodos);
+      when(() => mockHttp.get('/todos')).thenAnswer(
+        (_) async => HttpResponse(statusCode: 200, data: testTodosJson),
+      );
 
       final result = await repository.getTodos();
 
@@ -38,69 +37,82 @@ void main() {
       expect(result.length, 2);
     });
 
-    test('throws ApiError on failure', () async {
-      when(() => mockApi.getTodos()).thenThrow(Exception('Network error'));
+    test('throws HttpException on failure', () async {
+      when(() => mockHttp.get('/todos')).thenThrow(
+        const HttpException(statusCode: 500, message: 'Server error'),
+      );
 
       expect(
         () => repository.getTodos(),
-        throwsA(isA<ApiError>().having(
-          (e) => e.message,
-          'message',
-          'Failed to fetch todos',
-        )),
+        throwsA(isA<HttpException>()),
       );
     });
   });
 
   group('getTodoById', () {
     test('returns todo on success', () async {
-      const todo = Todo(id: 1, userId: 1, title: 'Todo 1');
-      when(() => mockApi.getTodoById(1)).thenAnswer((_) async => todo);
+      when(() => mockHttp.get('/todos/1')).thenAnswer(
+        (_) async => const HttpResponse(
+          statusCode: 200,
+          data: {'id': 1, 'userId': 1, 'title': 'Todo 1', 'completed': false},
+        ),
+      );
 
       final result = await repository.getTodoById(1);
 
-      expect(result, equals(todo));
+      expect(result, equals(const Todo(id: 1, userId: 1, title: 'Todo 1')));
     });
 
-    test('throws ApiError on failure', () async {
-      when(() => mockApi.getTodoById(1)).thenThrow(Exception('Not found'));
+    test('throws HttpException on failure', () async {
+      when(() => mockHttp.get('/todos/1')).thenThrow(
+        const HttpException(statusCode: 404, message: 'Not found'),
+      );
 
       expect(
         () => repository.getTodoById(1),
-        throwsA(isA<ApiError>().having(
-          (e) => e.message,
-          'message',
-          'Failed to fetch todo',
-        )),
+        throwsA(isA<HttpException>()),
       );
     });
   });
 
   group('createTodo', () {
     test('returns created todo on success', () async {
-      const newTodo = Todo(id: 201, userId: 1, title: 'New Todo');
-      when(() => mockApi.createTodo(any())).thenAnswer((_) async => newTodo);
+      when(() => mockHttp.post(
+            '/todos',
+            body: {
+              'title': 'New Todo',
+              'userId': 1,
+              'completed': false,
+            },
+          )).thenAnswer(
+        (_) async => const HttpResponse(
+          statusCode: 201,
+          data: {
+            'id': 201,
+            'userId': 1,
+            'title': 'New Todo',
+            'completed': false
+          },
+        ),
+      );
 
       final result = await repository.createTodo(title: 'New Todo', userId: 1);
 
-      expect(result, equals(newTodo));
-      verify(() => mockApi.createTodo({
-            'title': 'New Todo',
-            'userId': 1,
-            'completed': false,
-          })).called(1);
+      expect(result.title, 'New Todo');
+      expect(result.id, 201);
     });
 
-    test('throws ApiError on failure', () async {
-      when(() => mockApi.createTodo(any())).thenThrow(Exception('Error'));
+    test('throws HttpException on failure', () async {
+      when(() => mockHttp.post(
+            '/todos',
+            body: any(named: 'body'),
+          )).thenThrow(
+        const HttpException(statusCode: 500, message: 'Server error'),
+      );
 
       expect(
         () => repository.createTodo(title: 'New Todo', userId: 1),
-        throwsA(isA<ApiError>().having(
-          (e) => e.message,
-          'message',
-          'Failed to create todo',
-        )),
+        throwsA(isA<HttpException>()),
       );
     });
   });
@@ -108,48 +120,56 @@ void main() {
   group('updateTodo', () {
     test('returns updated todo on success', () async {
       const todo = Todo(id: 1, userId: 1, title: 'Updated', completed: true);
-      when(() => mockApi.updateTodo(1, any())).thenAnswer((_) async => todo);
+      when(() => mockHttp.put(
+            '/todos/1',
+            body: any(named: 'body'),
+          )).thenAnswer(
+        (_) async => const HttpResponse(
+          statusCode: 200,
+          data: {'id': 1, 'userId': 1, 'title': 'Updated', 'completed': true},
+        ),
+      );
 
       final result = await repository.updateTodo(todo);
 
       expect(result, equals(todo));
-      verify(() => mockApi.updateTodo(1, todo.toJson())).called(1);
     });
 
-    test('throws ApiError on failure', () async {
+    test('throws HttpException on failure', () async {
       const todo = Todo(id: 1, userId: 1, title: 'Test');
-      when(() => mockApi.updateTodo(1, any())).thenThrow(Exception('Error'));
+      when(() => mockHttp.put(
+            '/todos/1',
+            body: any(named: 'body'),
+          )).thenThrow(
+        const HttpException(statusCode: 500, message: 'Server error'),
+      );
 
       expect(
         () => repository.updateTodo(todo),
-        throwsA(isA<ApiError>().having(
-          (e) => e.message,
-          'message',
-          'Failed to update todo',
-        )),
+        throwsA(isA<HttpException>()),
       );
     });
   });
 
   group('deleteTodo', () {
     test('completes successfully', () async {
-      when(() => mockApi.deleteTodo(1)).thenAnswer((_) async {});
+      when(() => mockHttp.delete('/todos/1')).thenAnswer(
+        (_) async => const HttpResponse(statusCode: 200, data: null),
+      );
 
       await repository.deleteTodo(1);
 
-      verify(() => mockApi.deleteTodo(1)).called(1);
+      verify(() => mockHttp.delete('/todos/1')).called(1);
     });
 
-    test('throws ApiError on failure', () async {
-      when(() => mockApi.deleteTodo(1)).thenThrow(Exception('Error'));
+    test('throws HttpException on failure', () async {
+      when(() => mockHttp.delete('/todos/1')).thenThrow(
+        const HttpException(statusCode: 500, message: 'Server error'),
+      );
 
       expect(
         () => repository.deleteTodo(1),
-        throwsA(isA<ApiError>().having(
-          (e) => e.message,
-          'message',
-          'Failed to delete todo',
-        )),
+        throwsA(isA<HttpException>()),
       );
     });
   });
