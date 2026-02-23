@@ -35,9 +35,8 @@ class TodoListTile extends HookConsumerWidget {
           todo.title,
           style: TextStyle(
             decoration: todo.completed ? TextDecoration.lineThrough : null,
-            color: todo.completed
-                ? Theme.of(context).colorScheme.outline
-                : null,
+            color:
+                todo.completed ? Theme.of(context).colorScheme.outline : null,
           ),
         ),
         onTap: () => context.push('/todo/${todo.id}'),

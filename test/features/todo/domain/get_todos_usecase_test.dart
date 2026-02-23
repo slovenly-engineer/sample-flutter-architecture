@@ -23,7 +23,8 @@ void main() {
   ];
 
   group('GetTodosUseCase', () {
-    test('returns Success with list of todos when repository succeeds', () async {
+    test('returns Success with list of todos when repository succeeds',
+        () async {
       when(() => mockRepository.getTodos()).thenAnswer((_) async => testTodos);
 
       final result = await useCase();
@@ -49,7 +50,8 @@ void main() {
     });
 
     test('returns Failure with generic message on unexpected error', () async {
-      when(() => mockRepository.getTodos()).thenThrow(Exception('Network error'));
+      when(() => mockRepository.getTodos())
+          .thenThrow(Exception('Network error'));
 
       final result = await useCase();
 

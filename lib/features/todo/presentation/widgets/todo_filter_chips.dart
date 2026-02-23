@@ -26,9 +26,7 @@ class TodoFilterChips extends HookConsumerWidget {
               label: Text(filter.name.toUpperCase()),
               selected: isSelected,
               onSelected: (_) {
-                ref
-                    .read(todoFilterNotifierProvider.notifier)
-                    .setFilter(filter);
+                ref.read(todoFilterNotifierProvider.notifier).setFilter(filter);
               },
             ),
           );
