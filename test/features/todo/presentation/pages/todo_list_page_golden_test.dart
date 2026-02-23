@@ -11,9 +11,9 @@ import 'package:sample_flutter_architecture/features/todo/models/todo.dart';
 import 'package:sample_flutter_architecture/features/todo/presentation/pages/todo_list_page.dart';
 
 import '../../../../helpers/mocks.dart';
+import '../../../../helpers/test_app.dart';
 
 class MockAppNavigator extends Mock implements AppNavigator {}
-import '../../../../helpers/test_app.dart';
 
 void main() {
   setUpAll(() {
