@@ -1,7 +1,7 @@
 import '../../models/todo.dart';
 
-/// Repository interface for Todo data operations.
-/// This abstraction allows easy mocking in tests.
+/// Todoデータ操作のRepository抽象インターフェース（Domain層）。
+/// Data層でこのインターフェースを実装する。
 abstract class TodoRepository {
   Future<List<Todo>> getTodos();
   Future<Todo> getTodoById(int id);

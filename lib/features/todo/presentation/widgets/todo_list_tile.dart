@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../../../core/infrastructure/navigation/navigation_provider.dart';
 import '../../models/todo.dart';
 import '../providers/todo_list_provider.dart';
 
@@ -39,7 +39,7 @@ class TodoListTile extends HookConsumerWidget {
                 todo.completed ? Theme.of(context).colorScheme.outline : null,
           ),
         ),
-        onTap: () => context.push('/todo/${todo.id}'),
+        onTap: () => ref.read(appNavigatorProvider).goToTodoDetail('${todo.id}'),
       ),
     );
   }

@@ -1,10 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/network/dio_client.dart';
-import '../../data/api/todo_api.dart';
-import '../../data/repositories/todo_repository.dart';
+import '../../../../core/infrastructure/network/network_provider.dart';
 import '../../data/repositories/todo_repository_impl.dart';
+import '../repositories/todo_repository.dart';
 import '../usecases/get_todos_usecase.dart';
 import '../usecases/get_todo_detail_usecase.dart';
 import '../usecases/toggle_todo_usecase.dart';
@@ -13,18 +12,12 @@ import '../usecases/delete_todo_usecase.dart';
 
 part 'todo_providers.g.dart';
 
-// --- Data Layer Providers ---
-
-@riverpod
-TodoApi todoApi(Ref ref) {
-  final dio = ref.watch(dioClientProvider);
-  return TodoApi(dio);
-}
+// --- Data Layer Provider ---
 
 @riverpod
 TodoRepository todoRepository(Ref ref) {
-  final api = ref.watch(todoApiProvider);
-  return TodoRepositoryImpl(api: api);
+  final httpClient = ref.watch(httpClientProvider);
+  return TodoRepositoryImpl(httpClient);
 }
 
 // --- Domain Layer Providers (UseCases) ---

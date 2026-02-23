@@ -1,6 +1,9 @@
 import 'package:mocktail/mocktail.dart';
-import 'package:sample_flutter_architecture/features/todo/data/api/todo_api.dart';
-import 'package:sample_flutter_architecture/features/todo/data/repositories/todo_repository.dart';
+import 'package:sample_flutter_architecture/core/infrastructure/navigation/app_navigator.dart';
+import 'package:sample_flutter_architecture/core/infrastructure/network/http_client_service.dart';
+import 'package:sample_flutter_architecture/core/infrastructure/storage/local_db_service.dart';
+import 'package:sample_flutter_architecture/core/infrastructure/ui/dialogs/app_dialog_service.dart';
+import 'package:sample_flutter_architecture/features/todo/domain/repositories/todo_repository.dart';
 import 'package:sample_flutter_architecture/features/todo/domain/usecases/create_todo_usecase.dart';
 import 'package:sample_flutter_architecture/features/todo/domain/usecases/delete_todo_usecase.dart';
 import 'package:sample_flutter_architecture/features/todo/domain/usecases/get_todo_detail_usecase.dart';
@@ -9,7 +12,13 @@ import 'package:sample_flutter_architecture/features/todo/domain/usecases/toggle
 
 class MockTodoRepository extends Mock implements TodoRepository {}
 
-class MockTodoApi extends Mock implements TodoApi {}
+class MockHttpClientService extends Mock implements HttpClientService {}
+
+class MockLocalDbService extends Mock implements LocalDbService {}
+
+class MockAppNavigator extends Mock implements AppNavigator {}
+
+class MockAppDialogService extends Mock implements AppDialogService {}
 
 class MockGetTodosUseCase extends Mock implements GetTodosUseCase {}
 

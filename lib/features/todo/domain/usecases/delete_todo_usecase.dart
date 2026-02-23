@@ -1,6 +1,6 @@
 import '../../../../core/models/api_error.dart';
 import '../../../../core/models/result.dart';
-import '../../data/repositories/todo_repository.dart';
+import '../repositories/todo_repository.dart';
 
 class DeleteTodoUseCase {
   DeleteTodoUseCase({required this.repository});

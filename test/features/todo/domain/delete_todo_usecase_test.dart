@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sample_flutter_architecture/core/models/api_error.dart';
 import 'package:sample_flutter_architecture/core/models/result.dart';
-import 'package:sample_flutter_architecture/features/todo/data/repositories/todo_repository.dart';
+import 'package:sample_flutter_architecture/features/todo/domain/repositories/todo_repository.dart';
 import 'package:sample_flutter_architecture/features/todo/domain/usecases/delete_todo_usecase.dart';
 
 class MockTodoRepository extends Mock implements TodoRepository {}
