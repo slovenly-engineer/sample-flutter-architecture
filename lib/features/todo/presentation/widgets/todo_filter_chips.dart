@@ -17,18 +17,16 @@ class TodoFilterChips extends HookConsumerWidget {
         horizontal: AppSpacing.md,
         vertical: AppSpacing.sm,
       ),
-      child: Row(
+      child: Wrap(
+        spacing: AppSpacing.sm,
         children: TodoFilter.values.map((filter) {
           final isSelected = filter == currentFilter;
-          return Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.sm),
-            child: FilterChip(
-              label: Text(filter.name.toUpperCase()),
-              selected: isSelected,
-              onSelected: (_) {
-                ref.read(todoFilterNotifierProvider.notifier).setFilter(filter);
-              },
-            ),
+          return FilterChip(
+            label: Text(filter.name.toUpperCase()),
+            selected: isSelected,
+            onSelected: (_) {
+              ref.read(todoFilterNotifierProvider.notifier).setFilter(filter);
+            },
           );
         }).toList(),
       ),

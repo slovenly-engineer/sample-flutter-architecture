@@ -20,9 +20,10 @@ class TodoStatsBar extends HookConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _StatItem(label: 'Total', value: stats.total),
-          _StatItem(label: 'Active', value: stats.active),
-          _StatItem(label: 'Completed', value: stats.completed),
+          Expanded(child: _StatItem(label: 'Total', value: stats.total)),
+          Expanded(child: _StatItem(label: 'Active', value: stats.active)),
+          Expanded(
+              child: _StatItem(label: 'Completed', value: stats.completed)),
         ],
       ),
     );

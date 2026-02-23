@@ -59,3 +59,8 @@ coverage/
 
 # ObjectBox
 objectbox-model.json
+
+# Golden test files (platform-specific, not tracked)
+test/**/goldens/**/*.*
+test/**/failures/**/*.*
+!test/**/goldens/ci/*.*

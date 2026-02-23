@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:sample_flutter_architecture/core/models/api_error.dart';
 import 'package:sample_flutter_architecture/core/models/result.dart';
 import 'package:sample_flutter_architecture/features/todo/data/repositories/todo_repository.dart';
 import 'package:sample_flutter_architecture/features/todo/domain/usecases/create_todo_usecase.dart';
@@ -66,6 +67,35 @@ void main() {
       expect(result, isA<Success<Todo>>());
       verify(() => mockRepository.createTodo(title: 'Trimmed', userId: 1))
           .called(1);
+    });
+
+    test('returns Failure when repository throws ApiError', () async {
+      when(() => mockRepository.createTodo(
+            title: any(named: 'title'),
+            userId: any(named: 'userId'),
+          )).thenThrow(
+        const ApiError(statusCode: 500, message: 'Server error'),
+      );
+
+      final result = await useCase(title: 'Test', userId: 1);
+
+      expect(result, isA<Failure<Todo>>());
+      final error = (result as Failure<Todo>).error;
+      expect(error.statusCode, 500);
+    });
+
+    test('returns Failure with unexpected error', () async {
+      when(() => mockRepository.createTodo(
+            title: any(named: 'title'),
+            userId: any(named: 'userId'),
+          )).thenThrow(Exception('network error'));
+
+      final result = await useCase(title: 'Test', userId: 1);
+
+      expect(result, isA<Failure<Todo>>());
+      final error = (result as Failure<Todo>).error;
+      expect(error.statusCode, 0);
+      expect(error.message, 'Unexpected error');
     });
   });
 }
