@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:sample_flutter_architecture/core/infrastructure/navigation/navigation_provider.dart';
 import 'package:sample_flutter_architecture/core/models/result.dart';
 import 'package:sample_flutter_architecture/core/ui/theme/app_theme.dart';
 import 'package:sample_flutter_architecture/features/todo/domain/providers/todo_providers.dart';
@@ -15,6 +16,7 @@ void main() {
   late MockToggleTodoUseCase mockToggleTodoUseCase;
   late MockCreateTodoUseCase mockCreateTodoUseCase;
   late MockDeleteTodoUseCase mockDeleteTodoUseCase;
+  late MockAppNavigator mockAppNavigator;
 
   const activeTodo = Todo(id: 1, userId: 1, title: 'Active Todo');
   const completedTodo =
@@ -25,6 +27,7 @@ void main() {
     mockToggleTodoUseCase = MockToggleTodoUseCase();
     mockCreateTodoUseCase = MockCreateTodoUseCase();
     mockDeleteTodoUseCase = MockDeleteTodoUseCase();
+    mockAppNavigator = MockAppNavigator();
 
     when(() => mockGetTodosUseCase.call()).thenAnswer(
         (_) async => const Result.success([activeTodo, completedTodo]));
@@ -41,6 +44,7 @@ void main() {
         toggleTodoUseCaseProvider.overrideWith((ref) => mockToggleTodoUseCase),
         createTodoUseCaseProvider.overrideWith((ref) => mockCreateTodoUseCase),
         deleteTodoUseCaseProvider.overrideWith((ref) => mockDeleteTodoUseCase),
+        appNavigatorProvider.overrideWith((ref) => mockAppNavigator),
       ],
       child: MaterialApp(
         theme: AppTheme.light,
@@ -106,6 +110,16 @@ void main() {
       await tester.pump();
 
       verify(() => mockToggleTodoUseCase.call(any())).called(1);
+    });
+
+    testWidgets('tapping tile navigates to todo detail', (tester) async {
+      await tester.pumpWidget(createWidget(activeTodo));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Active Todo'));
+      await tester.pump();
+
+      verify(() => mockAppNavigator.goToTodoDetail('1')).called(1);
     });
 
     testWidgets('swiping triggers removeTodo', (tester) async {

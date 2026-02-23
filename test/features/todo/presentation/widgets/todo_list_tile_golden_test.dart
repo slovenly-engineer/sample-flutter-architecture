@@ -2,6 +2,7 @@ import 'package:alchemist/alchemist.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:sample_flutter_architecture/core/infrastructure/navigation/navigation_provider.dart';
 import 'package:sample_flutter_architecture/core/models/result.dart';
 import 'package:sample_flutter_architecture/features/todo/domain/providers/todo_providers.dart';
 import 'package:sample_flutter_architecture/features/todo/models/todo.dart';
@@ -18,6 +19,7 @@ void main() {
   final mockToggleTodoUseCase = MockToggleTodoUseCase();
   final mockCreateTodoUseCase = MockCreateTodoUseCase();
   final mockDeleteTodoUseCase = MockDeleteTodoUseCase();
+  final mockAppNavigator = MockAppNavigator();
 
   when(() => mockGetTodosUseCase.call()).thenAnswer(
       (_) async => const Result.success([activeTodo, completedTodo]));
@@ -29,6 +31,7 @@ void main() {
         toggleTodoUseCaseProvider.overrideWith((ref) => mockToggleTodoUseCase),
         createTodoUseCaseProvider.overrideWith((ref) => mockCreateTodoUseCase),
         deleteTodoUseCaseProvider.overrideWith((ref) => mockDeleteTodoUseCase),
+        appNavigatorProvider.overrideWith((ref) => mockAppNavigator),
       ],
       child: child,
     );

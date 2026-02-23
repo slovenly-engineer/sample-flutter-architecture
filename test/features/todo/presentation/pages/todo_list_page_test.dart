@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:sample_flutter_architecture/core/infrastructure/navigation/navigation_provider.dart';
 import 'package:sample_flutter_architecture/core/models/api_error.dart';
 import 'package:sample_flutter_architecture/core/models/result.dart';
 import 'package:sample_flutter_architecture/features/todo/domain/providers/todo_providers.dart';
@@ -18,6 +19,7 @@ void main() {
   late MockToggleTodoUseCase mockToggleTodoUseCase;
   late MockCreateTodoUseCase mockCreateTodoUseCase;
   late MockDeleteTodoUseCase mockDeleteTodoUseCase;
+  late MockAppNavigator mockAppNavigator;
 
   final testTodos = [
     const Todo(id: 1, userId: 1, title: 'Todo 1'),
@@ -29,6 +31,7 @@ void main() {
     mockToggleTodoUseCase = MockToggleTodoUseCase();
     mockCreateTodoUseCase = MockCreateTodoUseCase();
     mockDeleteTodoUseCase = MockDeleteTodoUseCase();
+    mockAppNavigator = MockAppNavigator();
   });
 
   setUpAll(() {
@@ -43,6 +46,7 @@ void main() {
         toggleTodoUseCaseProvider.overrideWith((ref) => mockToggleTodoUseCase),
         createTodoUseCaseProvider.overrideWith((ref) => mockCreateTodoUseCase),
         deleteTodoUseCaseProvider.overrideWith((ref) => mockDeleteTodoUseCase),
+        appNavigatorProvider.overrideWith((ref) => mockAppNavigator),
       ],
     );
   }
