@@ -8,15 +8,15 @@ enum SnackBarLevel { info, success, warning, error }
 
 /// 選択ダイアログの選択肢。
 class DialogOption<T> {
-  final String label;
-  final T value;
-  final bool isDestructive;
-
   const DialogOption({
     required this.label,
     required this.value,
     this.isDestructive = false,
   });
+
+  final String label;
+  final T value;
+  final bool isDestructive;
 }
 
 /// パッケージ非依存のダイアログ・スナックバー抽象インターフェース。

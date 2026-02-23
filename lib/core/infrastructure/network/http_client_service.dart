@@ -34,28 +34,28 @@ abstract class HttpClientService {
 
 /// パッケージ非依存のレスポンス型
 class HttpResponse {
-  final int statusCode;
-  final dynamic data;
-  final Map<String, List<String>> headers;
-
   const HttpResponse({
     required this.statusCode,
     required this.data,
     this.headers = const {},
   });
+
+  final int statusCode;
+  final dynamic data;
+  final Map<String, List<String>> headers;
 }
 
 /// パッケージ非依存のHTTP例外
 class HttpException implements Exception {
-  final int? statusCode;
-  final String message;
-  final dynamic data;
-
   const HttpException({
     this.statusCode,
     required this.message,
     this.data,
   });
+
+  final int? statusCode;
+  final String message;
+  final dynamic data;
 
   @override
   String toString() => 'HttpException($statusCode): $message';

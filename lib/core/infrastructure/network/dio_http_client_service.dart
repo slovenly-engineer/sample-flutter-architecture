@@ -5,9 +5,9 @@ import 'http_client_service.dart';
 /// Dioによる [HttpClientService] の具体実装。
 /// 外部パッケージ（Dio）を直接importするのはこのクラスのみ。
 class DioHttpClientService implements HttpClientService {
-  final Dio _dio;
-
   DioHttpClientService(this._dio);
+
+  final Dio _dio;
 
   @override
   Future<HttpResponse> get(

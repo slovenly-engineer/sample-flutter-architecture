@@ -7,14 +7,16 @@ import 'auth_service.dart';
 /// [AuthService] の具体実装。
 /// Core Infrastructureの抽象のみに依存する。
 class AuthServiceImpl implements AuthService {
+  AuthServiceImpl(this._db, this._http);
+
+  // ignore: unused_field
   final LocalDbService _db;
+  // ignore: unused_field
   final HttpClientService _http;
   final StreamController<bool> _authStateController =
       StreamController<bool>.broadcast();
 
   String? _cachedToken;
-
-  AuthServiceImpl(this._db, this._http);
 
   @override
   Future<bool> isAuthenticated() async {

@@ -5,9 +5,9 @@ import 'local_db_service.dart';
 /// ObjectBoxによる [LocalDbService] の具体実装。
 /// 外部パッケージ（ObjectBox）を直接importするのはこのクラスのみ。
 class ObjectBoxService implements LocalDbService {
-  final Store _store;
-
   ObjectBoxService(this._store);
+
+  final Store _store;
 
   Box<T> _box<T>() => _store.box<T>();
 

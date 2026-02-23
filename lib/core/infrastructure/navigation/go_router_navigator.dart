@@ -5,9 +5,9 @@ import 'app_navigator.dart';
 /// go_routerによる [AppNavigator] の具体実装。
 /// 外部パッケージ（go_router）を直接importするのはこのクラスのみ。
 class GoRouterNavigator implements AppNavigator {
-  final GoRouter _router;
-
   GoRouterNavigator(this._router);
+
+  final GoRouter _router;
 
   @override
   void goToTodoDetail(String todoId) => _router.push('/todos/$todoId');

@@ -52,7 +52,7 @@ void main() {
   group('getTodoById', () {
     test('returns todo on success', () async {
       when(() => mockHttp.get('/todos/1')).thenAnswer(
-        (_) async => HttpResponse(
+        (_) async => const HttpResponse(
           statusCode: 200,
           data: {'id': 1, 'userId': 1, 'title': 'Todo 1', 'completed': false},
         ),
@@ -85,7 +85,7 @@ void main() {
               'completed': false,
             },
           )).thenAnswer(
-        (_) async => HttpResponse(
+        (_) async => const HttpResponse(
           statusCode: 201,
           data: {'id': 201, 'userId': 1, 'title': 'New Todo', 'completed': false},
         ),
@@ -119,7 +119,7 @@ void main() {
             '/todos/1',
             body: any(named: 'body'),
           )).thenAnswer(
-        (_) async => HttpResponse(
+        (_) async => const HttpResponse(
           statusCode: 200,
           data: {'id': 1, 'userId': 1, 'title': 'Updated', 'completed': true},
         ),
@@ -149,7 +149,7 @@ void main() {
   group('deleteTodo', () {
     test('completes successfully', () async {
       when(() => mockHttp.delete('/todos/1')).thenAnswer(
-        (_) async => HttpResponse(statusCode: 200, data: null),
+        (_) async => const HttpResponse(statusCode: 200, data: null),
       );
 
       await repository.deleteTodo(1);

@@ -6,9 +6,9 @@ import '../../models/todo.dart';
 /// Core Infrastructureの抽象（HttpClientService）のみに依存する。
 /// Retrofitは不要 — パス定義・JSON変換はここで対応する。
 class TodoRepositoryImpl implements TodoRepository {
-  final HttpClientService _http;
-
   TodoRepositoryImpl(this._http);
+
+  final HttpClientService _http;
 
   @override
   Future<List<Todo>> getTodos() async {
