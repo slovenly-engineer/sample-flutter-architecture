@@ -9,13 +9,13 @@ void main() {
     builder: () => GoldenTestGroup(
       scenarioConstraints: const BoxConstraints(maxWidth: 400, maxHeight: 300),
       children: [
-        const GoldenTestScenario(
+        GoldenTestScenario(
           name: 'default',
-          child: AppEmptyView(message: 'No items found.'),
+          child: const AppEmptyView(message: 'No items found.'),
         ),
-        const GoldenTestScenario(
+        GoldenTestScenario(
           name: 'custom icon',
-          child: AppEmptyView(
+          child: const AppEmptyView(
             message: 'No todos found.',
             icon: Icons.checklist,
           ),

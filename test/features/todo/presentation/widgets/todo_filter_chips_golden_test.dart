@@ -8,7 +8,7 @@ import '../../../../helpers/test_app.dart';
 
 void main() {
   Widget wrapWithFilter(TodoFilter filter) {
-    return createTestApp(
+    return createTestAppWithScaffold(
       const TodoFilterChips(),
       overrides: [
         todoFilterNotifierProvider.overrideWith(

@@ -26,8 +26,8 @@ void main() {
     mockCreateTodoUseCase = MockCreateTodoUseCase();
     mockDeleteTodoUseCase = MockDeleteTodoUseCase();
 
-    when(() => mockGetTodosUseCase.call())
-        .thenAnswer((_) async => const Result.success([activeTodo, completedTodo]));
+    when(() => mockGetTodosUseCase.call()).thenAnswer(
+        (_) async => const Result.success([activeTodo, completedTodo]));
   });
 
   setUpAll(() {
@@ -38,12 +38,9 @@ void main() {
     return ProviderScope(
       overrides: [
         getTodosUseCaseProvider.overrideWith((ref) => mockGetTodosUseCase),
-        toggleTodoUseCaseProvider
-            .overrideWith((ref) => mockToggleTodoUseCase),
-        createTodoUseCaseProvider
-            .overrideWith((ref) => mockCreateTodoUseCase),
-        deleteTodoUseCaseProvider
-            .overrideWith((ref) => mockDeleteTodoUseCase),
+        toggleTodoUseCaseProvider.overrideWith((ref) => mockToggleTodoUseCase),
+        createTodoUseCaseProvider.overrideWith((ref) => mockCreateTodoUseCase),
+        deleteTodoUseCaseProvider.overrideWith((ref) => mockDeleteTodoUseCase),
       ],
       child: MaterialApp(
         theme: AppTheme.light,

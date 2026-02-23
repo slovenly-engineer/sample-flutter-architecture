@@ -8,14 +8,20 @@ void main() {
     fileName: 'app_loading_indicator',
     builder: () => GoldenTestGroup(
       scenarioConstraints: const BoxConstraints(maxWidth: 200, maxHeight: 200),
-      children: const [
+      children: [
         GoldenTestScenario(
           name: 'default size',
-          child: AppLoadingIndicator(),
+          child: const TickerMode(
+            enabled: false,
+            child: AppLoadingIndicator(),
+          ),
         ),
         GoldenTestScenario(
           name: 'custom size',
-          child: AppLoadingIndicator(size: 64),
+          child: const TickerMode(
+            enabled: false,
+            child: AppLoadingIndicator(size: 64),
+          ),
         ),
       ],
     ),

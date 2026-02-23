@@ -20,8 +20,7 @@ void main() {
   group('GetTodoDetailUseCase', () {
     test('returns Success with todo when repository succeeds', () async {
       const todo = Todo(id: 1, userId: 1, title: 'Test Todo');
-      when(() => mockRepository.getTodoById(1))
-          .thenAnswer((_) async => todo);
+      when(() => mockRepository.getTodoById(1)).thenAnswer((_) async => todo);
 
       final result = await useCase(1);
 

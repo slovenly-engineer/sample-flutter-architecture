@@ -10,7 +10,7 @@ void main() {
   group('TodoFilterChips', () {
     testWidgets('displays all filter chips', (tester) async {
       await tester.pumpWidget(
-        createTestApp(const TodoFilterChips()),
+        createTestAppWithScaffold(const TodoFilterChips()),
       );
 
       expect(find.text('ALL'), findsOneWidget);
@@ -20,7 +20,7 @@ void main() {
 
     testWidgets('ALL chip is selected by default', (tester) async {
       await tester.pumpWidget(
-        createTestApp(const TodoFilterChips()),
+        createTestAppWithScaffold(const TodoFilterChips()),
       );
 
       final allChip = tester.widget<FilterChip>(
@@ -31,7 +31,7 @@ void main() {
 
     testWidgets('tapping ACTIVE chip updates filter', (tester) async {
       await tester.pumpWidget(
-        createTestApp(const TodoFilterChips()),
+        createTestAppWithScaffold(const TodoFilterChips()),
       );
 
       await tester.tap(find.text('ACTIVE'));
@@ -45,7 +45,7 @@ void main() {
 
     testWidgets('tapping COMPLETED chip updates filter', (tester) async {
       await tester.pumpWidget(
-        createTestApp(const TodoFilterChips()),
+        createTestAppWithScaffold(const TodoFilterChips()),
       );
 
       await tester.tap(find.text('COMPLETED'));
@@ -59,7 +59,7 @@ void main() {
 
     testWidgets('reflects externally set filter', (tester) async {
       await tester.pumpWidget(
-        createTestApp(
+        createTestAppWithScaffold(
           const TodoFilterChips(),
           overrides: [
             todoFilterNotifierProvider.overrideWith(

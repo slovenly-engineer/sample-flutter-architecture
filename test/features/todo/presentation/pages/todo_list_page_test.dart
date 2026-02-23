@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -38,28 +40,26 @@ void main() {
       const TodoListPage(),
       overrides: [
         getTodosUseCaseProvider.overrideWith((ref) => mockGetTodosUseCase),
-        toggleTodoUseCaseProvider
-            .overrideWith((ref) => mockToggleTodoUseCase),
-        createTodoUseCaseProvider
-            .overrideWith((ref) => mockCreateTodoUseCase),
-        deleteTodoUseCaseProvider
-            .overrideWith((ref) => mockDeleteTodoUseCase),
+        toggleTodoUseCaseProvider.overrideWith((ref) => mockToggleTodoUseCase),
+        createTodoUseCaseProvider.overrideWith((ref) => mockCreateTodoUseCase),
+        deleteTodoUseCaseProvider.overrideWith((ref) => mockDeleteTodoUseCase),
       ],
     );
   }
 
   group('TodoListPage', () {
     testWidgets('shows loading indicator initially', (tester) async {
+      final completer = Completer<Result<List<Todo>>>();
       when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) => Future.delayed(
-                const Duration(seconds: 10),
-                () => Result.success(testTodos),
-              ));
+          .thenAnswer((_) => completer.future);
 
       await tester.pumpWidget(createPage());
       await tester.pump();
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+      completer.complete(Result.success(testTodos));
+      await tester.pumpAndSettle();
     });
 
     testWidgets('displays todos after loading', (tester) async {

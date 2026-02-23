@@ -45,7 +45,8 @@ void main() {
         const result = Result<String>.failure(error);
 
         expect(result, isA<Failure<String>>());
-        expect((result as Failure<String>).error.detail, 'Internal error details');
+        expect(
+            (result as Failure<String>).error.detail, 'Internal error details');
       });
     });
 

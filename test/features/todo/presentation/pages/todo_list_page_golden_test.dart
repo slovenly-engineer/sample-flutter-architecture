@@ -1,5 +1,6 @@
 import 'package:alchemist/alchemist.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sample_flutter_architecture/core/models/api_error.dart';
 import 'package:sample_flutter_architecture/core/models/result.dart';
@@ -89,8 +90,7 @@ void main() {
     fileName: 'todo_list_page_empty',
     builder: () {
       final mock = MockGetTodosUseCase();
-      when(() => mock.call())
-          .thenAnswer((_) async => const Result.success([]));
+      when(() => mock.call()).thenAnswer((_) async => const Result.success([]));
 
       return GoldenTestGroup(
         scenarioConstraints:

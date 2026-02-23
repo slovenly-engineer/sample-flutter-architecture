@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -43,17 +45,17 @@ void main() {
 
   group('TodoDetailPage', () {
     testWidgets('shows loading indicator while fetching', (tester) async {
-      when(() => mockGetTodoDetailUseCase.call(1)).thenAnswer(
-        (_) => Future.delayed(
-          const Duration(seconds: 10),
-          () => const Result.success(testTodo),
-        ),
-      );
+      final completer = Completer<Result<Todo>>();
+      when(() => mockGetTodoDetailUseCase.call(1))
+          .thenAnswer((_) => completer.future);
 
       await tester.pumpWidget(createPage());
       await tester.pump();
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+      completer.complete(const Result.success(testTodo));
+      await tester.pumpAndSettle();
     });
 
     testWidgets('displays app bar with title', (tester) async {

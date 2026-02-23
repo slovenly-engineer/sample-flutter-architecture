@@ -19,19 +19,16 @@ void main() {
   final mockCreateTodoUseCase = MockCreateTodoUseCase();
   final mockDeleteTodoUseCase = MockDeleteTodoUseCase();
 
-  when(() => mockGetTodosUseCase.call())
-      .thenAnswer((_) async => const Result.success([activeTodo, completedTodo]));
+  when(() => mockGetTodosUseCase.call()).thenAnswer(
+      (_) async => const Result.success([activeTodo, completedTodo]));
 
   Widget wrapWithProviders(Widget child) {
     return ProviderScope(
       overrides: [
         getTodosUseCaseProvider.overrideWith((ref) => mockGetTodosUseCase),
-        toggleTodoUseCaseProvider
-            .overrideWith((ref) => mockToggleTodoUseCase),
-        createTodoUseCaseProvider
-            .overrideWith((ref) => mockCreateTodoUseCase),
-        deleteTodoUseCaseProvider
-            .overrideWith((ref) => mockDeleteTodoUseCase),
+        toggleTodoUseCaseProvider.overrideWith((ref) => mockToggleTodoUseCase),
+        createTodoUseCaseProvider.overrideWith((ref) => mockCreateTodoUseCase),
+        deleteTodoUseCaseProvider.overrideWith((ref) => mockDeleteTodoUseCase),
       ],
       child: child,
     );

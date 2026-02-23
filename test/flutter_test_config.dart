@@ -9,7 +9,7 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   return AlchemistConfig.runWithConfig(
     config: AlchemistConfig(
       theme: AppTheme.light,
-      platformGoldensConfig: PlatformGoldensConfig(
+      platformGoldensConfig: const PlatformGoldensConfig(
         enabled: !isRunningInCi,
       ),
     ),

@@ -30,7 +30,6 @@ void main() {
       );
 
       expect(find.text('Retry'), findsOneWidget);
-      expect(find.byIcon(Icons.refresh), findsOneWidget);
     });
 
     testWidgets('hides Retry button when onRetry is null', (tester) async {

@@ -69,5 +69,19 @@ void main() {
       final error = (result as Failure<Todo>).error;
       expect(error.message, 'Update failed');
     });
+
+    test('returns Failure with unexpected error', () async {
+      const todo = Todo(id: 1, userId: 1, title: 'Test');
+
+      when(() => mockRepository.updateTodo(any()))
+          .thenThrow(Exception('network error'));
+
+      final result = await useCase(todo);
+
+      expect(result, isA<Failure<Todo>>());
+      final error = (result as Failure<Todo>).error;
+      expect(error.statusCode, 0);
+      expect(error.message, 'Unexpected error');
+    });
   });
 }

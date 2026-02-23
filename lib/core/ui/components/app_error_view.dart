@@ -15,7 +15,7 @@ class AppErrorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -33,10 +33,9 @@ class AppErrorView extends StatelessWidget {
             ),
             if (onRetry != null) ...[
               const SizedBox(height: AppSpacing.md),
-              FilledButton.icon(
+              FilledButton(
                 onPressed: onRetry,
-                icon: const Icon(Icons.refresh),
-                label: const Text('Retry'),
+                child: const Text('Retry'),
               ),
             ],
           ],
