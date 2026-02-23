@@ -137,6 +137,34 @@ void main() {
       expect(find.text('Completed'), findsOneWidget);
     });
 
+    testWidgets('submitting AddTodoDialog calls addTodo', (tester) async {
+      const newTodo = Todo(id: 3, userId: 1, title: 'New Todo');
+      when(() => mockGetTodosUseCase.call())
+          .thenAnswer((_) async => Result.success(testTodos));
+      when(() => mockCreateTodoUseCase.call(
+            title: any(named: 'title'),
+            userId: any(named: 'userId'),
+          )).thenAnswer((_) async => const Result.success(newTodo));
+
+      await tester.pumpWidget(createPage());
+      await tester.pumpAndSettle();
+
+      // Open dialog
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+
+      // Enter text and submit via the Add button
+      await tester.enterText(find.byType(TextField), 'New Todo');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Add'));
+      await tester.pumpAndSettle();
+
+      verify(() => mockCreateTodoUseCase.call(
+            title: any(named: 'title'),
+            userId: any(named: 'userId'),
+          )).called(1);
+    });
+
     testWidgets('shows filter chips', (tester) async {
       when(() => mockGetTodosUseCase.call())
           .thenAnswer((_) async => Result.success(testTodos));
