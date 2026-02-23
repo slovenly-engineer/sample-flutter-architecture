@@ -114,4 +114,16 @@ class TodoStats {
   final int total;
   final int completed;
   final int active;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TodoStats &&
+          runtimeType == other.runtimeType &&
+          total == other.total &&
+          completed == other.completed &&
+          active == other.active;
+
+  @override
+  int get hashCode => Object.hash(total, completed, active);
 }

@@ -1,3 +1,4 @@
+import '../../../../core/models/api_error.dart';
 import '../../../../core/infrastructure/network/http_client_service.dart';
 import '../../domain/repositories/todo_repository.dart';
 import '../../models/todo.dart';
@@ -18,8 +19,12 @@ class TodoRepositoryImpl implements TodoRepository {
       return list
           .map((json) => Todo.fromJson(json as Map<String, dynamic>))
           .toList();
-    } on HttpException {
-      rethrow;
+    } on HttpException catch (e) {
+      throw ApiError(
+        statusCode: e.statusCode ?? 0,
+        message: e.message,
+        detail: e.data?.toString(),
+      );
     }
   }
 
@@ -28,8 +33,12 @@ class TodoRepositoryImpl implements TodoRepository {
     try {
       final response = await _http.get('/todos/$id');
       return Todo.fromJson(response.data as Map<String, dynamic>);
-    } on HttpException {
-      rethrow;
+    } on HttpException catch (e) {
+      throw ApiError(
+        statusCode: e.statusCode ?? 0,
+        message: e.message,
+        detail: e.data?.toString(),
+      );
     }
   }
 
@@ -48,8 +57,12 @@ class TodoRepositoryImpl implements TodoRepository {
         },
       );
       return Todo.fromJson(response.data as Map<String, dynamic>);
-    } on HttpException {
-      rethrow;
+    } on HttpException catch (e) {
+      throw ApiError(
+        statusCode: e.statusCode ?? 0,
+        message: e.message,
+        detail: e.data?.toString(),
+      );
     }
   }
 
@@ -61,8 +74,12 @@ class TodoRepositoryImpl implements TodoRepository {
         body: todo.toJson(),
       );
       return Todo.fromJson(response.data as Map<String, dynamic>);
-    } on HttpException {
-      rethrow;
+    } on HttpException catch (e) {
+      throw ApiError(
+        statusCode: e.statusCode ?? 0,
+        message: e.message,
+        detail: e.data?.toString(),
+      );
     }
   }
 
@@ -70,8 +87,12 @@ class TodoRepositoryImpl implements TodoRepository {
   Future<void> deleteTodo(int id) async {
     try {
       await _http.delete('/todos/$id');
-    } on HttpException {
-      rethrow;
+    } on HttpException catch (e) {
+      throw ApiError(
+        statusCode: e.statusCode ?? 0,
+        message: e.message,
+        detail: e.data?.toString(),
+      );
     }
   }
 }
