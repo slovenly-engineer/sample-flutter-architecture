@@ -49,6 +49,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Coverage
+coverage/
+
 # Generated files
 *.freezed.dart
 *.g.dart
