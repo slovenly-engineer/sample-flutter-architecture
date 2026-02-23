@@ -1,0 +1,114 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # --------------------------------------------------
+  # 1. Analyze (lint)
+  # --------------------------------------------------
+  analyze:
+    name: Lint (flutter analyze)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: dart run build_runner build --delete-conflicting-outputs
+      - run: flutter analyze --fatal-infos
+
+  # --------------------------------------------------
+  # 2. Format
+  # --------------------------------------------------
+  format:
+    name: Format (dart format)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Check formatting
+        run: dart format --set-exit-if-changed lib/ test/
+
+  # --------------------------------------------------
+  # 3. Dart Fix
+  # --------------------------------------------------
+  dart-fix:
+    name: Dart Fix
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: dart run build_runner build --delete-conflicting-outputs
+      - name: Check dart fix (dry run)
+        run: |
+          dart fix --dry-run | tee /tmp/dart_fix_output.txt
+          if grep -q "has proposed" /tmp/dart_fix_output.txt; then
+            echo "::error::dart fix has suggested changes. Run 'dart fix --apply' locally."
+            exit 1
+          fi
+
+  # --------------------------------------------------
+  # 4. Generated Files Diff
+  # --------------------------------------------------
+  generated-files:
+    name: Generated Files Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: dart run build_runner build --delete-conflicting-outputs
+      - name: Check for uncommitted generated files
+        run: |
+          if [ -n "$(git diff --name-only)" ]; then
+            echo "::error::Generated files are out of date. Run 'dart run build_runner build --delete-conflicting-outputs' and commit the changes."
+            echo ""
+            echo "Changed files:"
+            git diff --name-only
+            echo ""
+            echo "Diff:"
+            git diff
+            exit 1
+          fi
+          echo "Generated files are up to date."
+
+  # --------------------------------------------------
+  # 5. Tests
+  # --------------------------------------------------
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: dart run build_runner build --delete-conflicting-outputs
+      - run: flutter test --coverage
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/lcov.info
+          retention-days: 7
