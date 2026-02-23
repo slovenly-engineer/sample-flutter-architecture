@@ -87,7 +87,12 @@ void main() {
           )).thenAnswer(
         (_) async => const HttpResponse(
           statusCode: 201,
-          data: {'id': 201, 'userId': 1, 'title': 'New Todo', 'completed': false},
+          data: {
+            'id': 201,
+            'userId': 1,
+            'title': 'New Todo',
+            'completed': false
+          },
         ),
       );
 

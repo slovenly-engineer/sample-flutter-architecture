@@ -39,7 +39,8 @@ class TodoListTile extends HookConsumerWidget {
                 todo.completed ? Theme.of(context).colorScheme.outline : null,
           ),
         ),
-        onTap: () => ref.read(appNavigatorProvider).goToTodoDetail('${todo.id}'),
+        onTap: () =>
+            ref.read(appNavigatorProvider).goToTodoDetail('${todo.id}'),
       ),
     );
   }
