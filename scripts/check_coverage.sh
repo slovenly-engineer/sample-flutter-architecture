@@ -3,16 +3,18 @@
 # check_coverage.sh — lcov.info を解析してカバレッジを報告するスクリプト
 #
 #   閾値:
-#     - 80% 未満 → エラー (exit 1)
-#     - 80% 以上 90% 未満 → 警告
-#     - 90% 以上 → 合格
+#     - 90% 未満 → エラー (exit 1)
+#     - 90% 以上 95% 未満 → 警告
+#     - 95% 以上 → 合格
+#
+#   生成ファイル (.g.dart, .freezed.dart) はカバレッジ計測から除外
 # ---------------------------------------------------------------------------
 
 set -euo pipefail
 
 COVERAGE_FILE="${1:-coverage/lcov.info}"
-MIN_COVERAGE=80
-TARGET_COVERAGE=90
+MIN_COVERAGE=90
+TARGET_COVERAGE=95
 
 # ---------------------------------------------------------------------------
 # lcov.info の存在チェック
@@ -54,6 +56,11 @@ while IFS= read -r line; do
       file_hits="${line#LH:}"
       ;;
     end_of_record)
+      # 生成ファイルをスキップ
+      if [[ "$current_file" == *.g.dart ]] || [[ "$current_file" == *.freezed.dart ]] || [[ "$current_file" == *.gr.dart ]]; then
+        current_file=""
+        continue
+      fi
       if [ -n "$current_file" ] && [ "$file_lines" -gt 0 ]; then
         file_pct=$((file_hits * 100 / file_lines))
         # lib/ 以降のパスのみ表示

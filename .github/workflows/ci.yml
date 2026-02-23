@@ -104,7 +104,8 @@ jobs:
           cache: true
       - run: flutter pub get
       - run: dart run build_runner build --delete-conflicting-outputs
-      - run: flutter test --coverage
+      - run: flutter test --dart-define=CI=true --update-goldens
+      - run: flutter test --dart-define=CI=true --coverage
       - name: Coverage check
         run: bash scripts/check_coverage.sh coverage/lcov.info
       - name: Upload coverage
