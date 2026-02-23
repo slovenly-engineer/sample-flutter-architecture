@@ -105,6 +105,8 @@ jobs:
       - run: flutter pub get
       - run: dart run build_runner build --delete-conflicting-outputs
       - run: flutter test --coverage
+      - name: Coverage check
+        run: bash scripts/check_coverage.sh coverage/lcov.info
       - name: Upload coverage
         if: always()
         uses: actions/upload-artifact@v4
