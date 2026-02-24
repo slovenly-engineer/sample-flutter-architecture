@@ -1,0 +1,29 @@
+{
+  "mcpServers": {
+    "dart": {
+      "type": "stdio",
+      "command": "dart",
+      "args": ["mcp-server"]
+    },
+    "flutter-docs": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "flutter-mcp"]
+    },
+    "pubdev": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@devqxi/pubdev-mcp-server"]
+    },
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    },
+    "fetch": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["mcp-server-fetch"]
+    }
+  }
+}
