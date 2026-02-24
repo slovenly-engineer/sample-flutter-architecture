@@ -2,15 +2,35 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Flutter Version Management (FVM)
+
+This project uses [FVM](https://fvm.app/) to manage the Flutter SDK version.
+The required version is defined in `.fvmrc`.
+
+```bash
+# Install FVM (if not already installed)
+dart pub global activate fvm
+
+# Install the project's Flutter version
+fvm install
+
+# Use FVM-managed Flutter (prefix commands with `fvm`)
+fvm flutter pub get
+fvm flutter run
+fvm flutter test
+```
+
+Alternatively, if FVM is configured as the default, `flutter` commands work directly.
+
 ## Build & Development Commands
 
 ```bash
 # Setup
-flutter pub get
+fvm flutter pub get
 dart run build_runner build --delete-conflicting-outputs
 
 # Run
-flutter run
+fvm flutter run
 
 # Tests
 flutter test                                    # All tests
@@ -105,7 +125,7 @@ Golden tests use separate directories for CI (`goldens/ci/`) vs local (`goldens/
 
 ## CI Pipeline
 
-GitHub Actions runs on Ubuntu with Flutter 3.27.4:
+GitHub Actions runs on Ubuntu with the Flutter version from `.fvmrc`:
 1. Analyze (lint)
 2. Format check
 3. Dart fix check

@@ -6,7 +6,15 @@ if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
   exit 0
 fi
 
-FLUTTER_VERSION="3.27.4"
+# Read Flutter version from .fvmrc
+FVMRC_PATH="${CLAUDE_PROJECT_DIR}/.fvmrc"
+if [ -f "$FVMRC_PATH" ]; then
+  FLUTTER_VERSION=$(grep -o '"flutter": *"[^"]*"' "$FVMRC_PATH" | grep -o '"[^"]*"$' | tr -d '"')
+else
+  echo "Error: .fvmrc not found at $FVMRC_PATH"
+  exit 1
+fi
+
 FLUTTER_DIR="/opt/flutter"
 FLUTTER_URL="https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz"
 
