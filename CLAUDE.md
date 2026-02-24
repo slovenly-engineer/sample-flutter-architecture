@@ -137,12 +137,14 @@ GitHub Actions runs on Ubuntu with the Flutter version from `.fvmrc`:
 
 This project configures MCP (Model Context Protocol) servers in `.mcp.json` to enhance Claude Code's Flutter development capabilities. These are auto-approved via `enableAllProjectMcpServers` in `.claude/settings.json`.
 
+> **Security Note**: Auto-approving MCP servers means any server defined in `.mcp.json` will run automatically without a manual prompt. This is convenient for web-based development but carries risk — if a malicious server configuration is committed (e.g., via a compromised account), it could execute arbitrary code. Always review changes to `.mcp.json` carefully in PRs. If you prefer a stricter security posture, disable `enableAllProjectMcpServers` and approve servers manually.
+
 ### Configured Servers
 
 | Server | Command | Purpose |
 |--------|---------|---------|
 | `dart` | `dart mcp-server` | Official Dart/Flutter MCP — code analysis, symbol resolution, pub.dev search, dependency management, test runner, formatter (requires Dart 3.9+) |
-| `context7` | `npx -y @upstash/context7-mcp` | Fetches up-to-date, version-specific documentation for any library (Riverpod, Freezed, go_router, Dio, etc.) |
+| `context7` | `npx -y @upstash/context7-mcp@2.1.2` | Fetches up-to-date, version-specific documentation for any library (Riverpod, Freezed, go_router, Dio, etc.) |
 
 ### Prerequisites
 
