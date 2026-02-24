@@ -152,6 +152,19 @@ These servers require the following runtimes (installed by the SessionStart hook
 - **Dart 3.9+** (for `dart mcp-server`)
 - **Node.js / npx** (for `context7`)
 
+## Code Review
+
+コードレビューのコメントはすべて**日本語**で記述してください。
+
+レビュー時には以下の観点を重視してください：
+- **アーキテクチャ**: Feature-First + Layered Architecture に準拠しているか
+- **状態管理**: Riverpod + Hooks パターンが正しく使われているか
+- **エラーハンドリング**: `Result<T>` パターンで型安全にエラー処理されているか
+- **モデル**: Freezed による不変データモデルが適切に定義されているか
+- **API 層**: Retrofit + Dio のパターンに従っているか
+- **テスト**: テストカバレッジ 90% 以上を維持できるか
+- **コーディング規約**: flutter_lints、`prefer_const_constructors`、`prefer_single_quotes` に準拠しているか
+
 ## Conventions
 
 - **Commits**: Conventional Commits format (`feat:`, `fix:`, `test:`, `ci:`)
