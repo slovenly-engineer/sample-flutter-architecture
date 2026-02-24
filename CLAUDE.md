@@ -142,17 +142,13 @@ This project configures MCP (Model Context Protocol) servers in `.mcp.json` to e
 | Server | Command | Purpose |
 |--------|---------|---------|
 | `dart` | `dart mcp-server` | Official Dart/Flutter MCP — code analysis, symbol resolution, pub.dev search, dependency management, test runner, formatter (requires Dart 3.9+) |
-| `flutter-docs` | `npx -y flutter-mcp` | Real-time Flutter/Dart documentation and pub.dev package docs via `flutter_search` and `flutter_docs` tools |
-| `pubdev` | `npx -y @devqxi/pubdev-mcp-server` | Advanced pub.dev search with filtering, dependency analysis, version comparison, and changelog access |
 | `context7` | `npx -y @upstash/context7-mcp` | Fetches up-to-date, version-specific documentation for any library (Riverpod, Freezed, go_router, Dio, etc.) |
-| `fetch` | `uvx mcp-server-fetch` | Fetches web URLs and converts HTML to markdown — useful for API docs, migration guides, and issue references |
 
 ### Prerequisites
 
 These servers require the following runtimes (installed by the SessionStart hook):
 - **Dart 3.9+** (for `dart mcp-server`)
-- **Node.js / npx** (for npm-based servers)
-- **Python / uvx** (for `mcp-server-fetch`)
+- **Node.js / npx** (for `context7`)
 
 ## Conventions
 
