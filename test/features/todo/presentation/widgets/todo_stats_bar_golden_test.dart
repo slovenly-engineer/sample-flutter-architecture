@@ -9,9 +9,7 @@ void main() {
   Widget wrapWithOverrides(TodoStats stats) {
     return createTestApp(
       const TodoStatsBar(),
-      overrides: [
-        todoStatsProvider.overrideWith((ref) => stats),
-      ],
+      overrides: [todoStatsProvider.overrideWith((ref) => stats)],
     );
   }
 

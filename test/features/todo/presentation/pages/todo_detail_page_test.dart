@@ -15,12 +15,7 @@ import '../../../../helpers/test_app.dart';
 void main() {
   late MockGetTodoDetailUseCase mockGetTodoDetailUseCase;
 
-  const testTodo = Todo(
-    id: 1,
-    userId: 1,
-    title: 'Test Todo',
-    completed: false,
-  );
+  const testTodo = Todo(id: 1, userId: 1, title: 'Test Todo', completed: false);
 
   const completedTodo = Todo(
     id: 2,
@@ -37,8 +32,9 @@ void main() {
     return createTestApp(
       TodoDetailPage(todoId: todoId),
       overrides: [
-        getTodoDetailUseCaseProvider
-            .overrideWith((ref) => mockGetTodoDetailUseCase),
+        getTodoDetailUseCaseProvider.overrideWith(
+          (ref) => mockGetTodoDetailUseCase,
+        ),
       ],
     );
   }
@@ -46,8 +42,9 @@ void main() {
   group('TodoDetailPage', () {
     testWidgets('shows loading indicator while fetching', (tester) async {
       final completer = Completer<Result<Todo>>();
-      when(() => mockGetTodoDetailUseCase.call(1))
-          .thenAnswer((_) => completer.future);
+      when(
+        () => mockGetTodoDetailUseCase.call(1),
+      ).thenAnswer((_) => completer.future);
 
       await tester.pumpWidget(createPage());
       await tester.pump();
@@ -59,8 +56,9 @@ void main() {
     });
 
     testWidgets('displays app bar with title', (tester) async {
-      when(() => mockGetTodoDetailUseCase.call(1))
-          .thenAnswer((_) async => const Result.success(testTodo));
+      when(
+        () => mockGetTodoDetailUseCase.call(1),
+      ).thenAnswer((_) async => const Result.success(testTodo));
 
       await tester.pumpWidget(createPage());
       await tester.pumpAndSettle();
@@ -69,8 +67,9 @@ void main() {
     });
 
     testWidgets('displays active todo details', (tester) async {
-      when(() => mockGetTodoDetailUseCase.call(1))
-          .thenAnswer((_) async => const Result.success(testTodo));
+      when(
+        () => mockGetTodoDetailUseCase.call(1),
+      ).thenAnswer((_) async => const Result.success(testTodo));
 
       await tester.pumpWidget(createPage());
       await tester.pumpAndSettle();
@@ -82,8 +81,9 @@ void main() {
     });
 
     testWidgets('displays completed todo details', (tester) async {
-      when(() => mockGetTodoDetailUseCase.call(2))
-          .thenAnswer((_) async => const Result.success(completedTodo));
+      when(
+        () => mockGetTodoDetailUseCase.call(2),
+      ).thenAnswer((_) async => const Result.success(completedTodo));
 
       await tester.pumpWidget(createPage(todoId: 2));
       await tester.pumpAndSettle();
@@ -108,26 +108,27 @@ void main() {
     });
 
     testWidgets('retry button triggers reload', (tester) async {
-      var callCount = 0;
-      when(() => mockGetTodoDetailUseCase.call(1)).thenAnswer((_) async {
-        callCount++;
-        if (callCount == 1) {
-          return const Result.failure(
-            ApiError(statusCode: 500, message: 'Error'),
-          );
-        }
-        return const Result.success(testTodo);
-      });
+      // First: always fail
+      when(() => mockGetTodoDetailUseCase.call(1)).thenAnswer(
+        (_) async =>
+            const Result.failure(ApiError(statusCode: 500, message: 'Error')),
+      );
 
       await tester.pumpWidget(createPage());
       await tester.pumpAndSettle();
 
       expect(find.text('Retry'), findsOneWidget);
 
+      // Now: change mock to succeed on next call
+      when(
+        () => mockGetTodoDetailUseCase.call(1),
+      ).thenAnswer((_) async => const Result.success(testTodo));
+
       await tester.tap(find.text('Retry'));
       await tester.pumpAndSettle();
 
-      expect(callCount, greaterThan(1));
+      // After retry, the todo should be displayed
+      expect(find.text('Test Todo'), findsOneWidget);
     });
   });
 }

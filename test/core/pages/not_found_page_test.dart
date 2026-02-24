@@ -11,10 +11,7 @@ void main() {
 
     expect(find.text('Not Found'), findsOneWidget);
     expect(find.text('ページが見つかりません'), findsOneWidget);
-    expect(
-      find.text('お探しのページは存在しないか、移動した可能性があります。'),
-      findsOneWidget,
-    );
+    expect(find.text('お探しのページは存在しないか、移動した可能性があります。'), findsOneWidget);
     expect(find.byIcon(Icons.search_off), findsOneWidget);
   });
 }

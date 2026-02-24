@@ -16,9 +16,7 @@ class TodoDetailPage extends HookConsumerWidget {
     final todoAsync = ref.watch(todoDetailProvider(todoId));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Todo Detail'),
-      ),
+      appBar: AppBar(title: const Text('Todo Detail')),
       body: todoAsync.when(
         data: (todo) => Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -49,8 +47,8 @@ class TodoDetailPage extends HookConsumerWidget {
               Text(
                 'User ID: ${todo.userId}',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
+                  color: Theme.of(context).colorScheme.outline,
+                ),
               ),
             ],
           ),

@@ -11,10 +11,7 @@ void main() {
       children: [
         GoldenTestScenario(
           name: 'default size',
-          child: const TickerMode(
-            enabled: false,
-            child: AppLoadingIndicator(),
-          ),
+          child: const TickerMode(enabled: false, child: AppLoadingIndicator()),
         ),
         GoldenTestScenario(
           name: 'custom size',

@@ -23,23 +23,27 @@ void main() {
   ];
 
   group('GetTodosUseCase', () {
-    test('returns Success with list of todos when repository succeeds',
-        () async {
-      when(() => mockRepository.getTodos()).thenAnswer((_) async => testTodos);
+    test(
+      'returns Success with list of todos when repository succeeds',
+      () async {
+        when(
+          () => mockRepository.getTodos(),
+        ).thenAnswer((_) async => testTodos);
 
-      final result = await useCase();
+        final result = await useCase();
 
-      expect(result, isA<Success<List<Todo>>>());
-      final data = (result as Success<List<Todo>>).data;
-      expect(data, equals(testTodos));
-      expect(data.length, 2);
-      verify(() => mockRepository.getTodos()).called(1);
-    });
+        expect(result, isA<Success<List<Todo>>>());
+        final data = (result as Success<List<Todo>>).data;
+        expect(data, equals(testTodos));
+        expect(data.length, 2);
+        verify(() => mockRepository.getTodos()).called(1);
+      },
+    );
 
     test('returns Failure when repository throws ApiError', () async {
-      when(() => mockRepository.getTodos()).thenThrow(
-        const ApiError(statusCode: 500, message: 'Server error'),
-      );
+      when(
+        () => mockRepository.getTodos(),
+      ).thenThrow(const ApiError(statusCode: 500, message: 'Server error'));
 
       final result = await useCase();
 
@@ -50,8 +54,9 @@ void main() {
     });
 
     test('returns Failure with generic message on unexpected error', () async {
-      when(() => mockRepository.getTodos())
-          .thenThrow(Exception('Network error'));
+      when(
+        () => mockRepository.getTodos(),
+      ).thenThrow(Exception('Network error'));
 
       final result = await useCase();
 

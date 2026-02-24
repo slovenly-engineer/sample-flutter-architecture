@@ -16,7 +16,7 @@ void main() {
         statusCode: 200,
         data: null,
         headers: {
-          'content-type': ['application/json']
+          'content-type': ['application/json'],
         },
       );
 

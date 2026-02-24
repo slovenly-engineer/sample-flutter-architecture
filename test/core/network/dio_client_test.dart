@@ -11,10 +11,7 @@ void main() {
 
       final dio = container.read(dioProvider);
       expect(dio, isA<Dio>());
-      expect(
-        dio.options.baseUrl,
-        'https://jsonplaceholder.typicode.com',
-      );
+      expect(dio.options.baseUrl, 'https://jsonplaceholder.typicode.com');
     });
 
     test('configures timeouts', () {
@@ -31,10 +28,7 @@ void main() {
       addTearDown(container.dispose);
 
       final dio = container.read(dioProvider);
-      expect(
-        dio.interceptors.whereType<LogInterceptor>().length,
-        1,
-      );
+      expect(dio.interceptors.whereType<LogInterceptor>().length, 1);
     });
   });
 }

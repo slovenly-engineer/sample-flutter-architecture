@@ -10,7 +10,7 @@ class TodoFilterChips extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentFilter = ref.watch(todoFilterNotifierProvider);
+    final currentFilter = ref.watch(todoFilterProvider);
 
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -25,7 +25,7 @@ class TodoFilterChips extends HookConsumerWidget {
             label: Text(filter.name.toUpperCase()),
             selected: isSelected,
             onSelected: (_) {
-              ref.read(todoFilterNotifierProvider.notifier).setFilter(filter);
+              ref.read(todoFilterProvider.notifier).setFilter(filter);
             },
           );
         }).toList(),

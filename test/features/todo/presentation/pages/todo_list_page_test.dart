@@ -54,8 +54,9 @@ void main() {
   group('TodoListPage', () {
     testWidgets('shows loading indicator initially', (tester) async {
       final completer = Completer<Result<List<Todo>>>();
-      when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) => completer.future);
+      when(
+        () => mockGetTodosUseCase.call(),
+      ).thenAnswer((_) => completer.future);
 
       await tester.pumpWidget(createPage());
       await tester.pump();
@@ -67,8 +68,9 @@ void main() {
     });
 
     testWidgets('displays todos after loading', (tester) async {
-      when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) async => Result.success(testTodos));
+      when(
+        () => mockGetTodosUseCase.call(),
+      ).thenAnswer((_) async => Result.success(testTodos));
 
       await tester.pumpWidget(createPage());
       await tester.pumpAndSettle();
@@ -78,8 +80,9 @@ void main() {
     });
 
     testWidgets('shows app bar with title', (tester) async {
-      when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) async => Result.success(testTodos));
+      when(
+        () => mockGetTodosUseCase.call(),
+      ).thenAnswer((_) async => Result.success(testTodos));
 
       await tester.pumpWidget(createPage());
       await tester.pumpAndSettle();
@@ -88,8 +91,9 @@ void main() {
     });
 
     testWidgets('has floating action button', (tester) async {
-      when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) async => Result.success(testTodos));
+      when(
+        () => mockGetTodosUseCase.call(),
+      ).thenAnswer((_) async => Result.success(testTodos));
 
       await tester.pumpWidget(createPage());
       await tester.pumpAndSettle();
@@ -99,8 +103,9 @@ void main() {
     });
 
     testWidgets('FAB opens AddTodoDialog', (tester) async {
-      when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) async => Result.success(testTodos));
+      when(
+        () => mockGetTodosUseCase.call(),
+      ).thenAnswer((_) async => Result.success(testTodos));
 
       await tester.pumpWidget(createPage());
       await tester.pumpAndSettle();
@@ -126,8 +131,9 @@ void main() {
     });
 
     testWidgets('shows stats bar', (tester) async {
-      when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) async => Result.success(testTodos));
+      when(
+        () => mockGetTodosUseCase.call(),
+      ).thenAnswer((_) async => Result.success(testTodos));
 
       await tester.pumpWidget(createPage());
       await tester.pumpAndSettle();
@@ -139,12 +145,15 @@ void main() {
 
     testWidgets('submitting AddTodoDialog calls addTodo', (tester) async {
       const newTodo = Todo(id: 3, userId: 1, title: 'New Todo');
-      when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) async => Result.success(testTodos));
-      when(() => mockCreateTodoUseCase.call(
-            title: any(named: 'title'),
-            userId: any(named: 'userId'),
-          )).thenAnswer((_) async => const Result.success(newTodo));
+      when(
+        () => mockGetTodosUseCase.call(),
+      ).thenAnswer((_) async => Result.success(testTodos));
+      when(
+        () => mockCreateTodoUseCase.call(
+          title: any(named: 'title'),
+          userId: any(named: 'userId'),
+        ),
+      ).thenAnswer((_) async => const Result.success(newTodo));
 
       await tester.pumpWidget(createPage());
       await tester.pumpAndSettle();
@@ -159,15 +168,18 @@ void main() {
       await tester.tap(find.text('Add'));
       await tester.pumpAndSettle();
 
-      verify(() => mockCreateTodoUseCase.call(
-            title: any(named: 'title'),
-            userId: any(named: 'userId'),
-          )).called(1);
+      verify(
+        () => mockCreateTodoUseCase.call(
+          title: any(named: 'title'),
+          userId: any(named: 'userId'),
+        ),
+      ).called(1);
     });
 
     testWidgets('shows filter chips', (tester) async {
-      when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) async => Result.success(testTodos));
+      when(
+        () => mockGetTodosUseCase.call(),
+      ).thenAnswer((_) async => Result.success(testTodos));
 
       await tester.pumpWidget(createPage());
       await tester.pumpAndSettle();

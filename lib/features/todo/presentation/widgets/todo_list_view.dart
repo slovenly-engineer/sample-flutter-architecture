@@ -12,7 +12,7 @@ class TodoListView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final todosAsync = ref.watch(todoListNotifierProvider);
+    final todosAsync = ref.watch(todoListProvider);
     final filteredTodoList = ref.watch(filteredTodosProvider);
 
     return todosAsync.when(
@@ -35,7 +35,7 @@ class TodoListView extends HookConsumerWidget {
       loading: () => const AppLoadingIndicator(),
       error: (error, _) => AppErrorView(
         message: error.toString(),
-        onRetry: () => ref.invalidate(todoListNotifierProvider),
+        onRetry: () => ref.invalidate(todoListProvider),
       ),
     );
   }

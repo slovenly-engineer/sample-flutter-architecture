@@ -52,11 +52,13 @@ void main() {
 
   group('get', () {
     test('returns HttpResponse on success', () async {
-      when(() => mockDio.get(
-            any(),
-            queryParameters: any(named: 'queryParameters'),
-            options: any(named: 'options'),
-          )).thenAnswer(
+      when(
+        () => mockDio.get(
+          any(),
+          queryParameters: any(named: 'queryParameters'),
+          options: any(named: 'options'),
+        ),
+      ).thenAnswer(
         (_) async => createResponse(statusCode: 200, data: {'key': 'value'}),
       );
 
@@ -67,65 +69,74 @@ void main() {
     });
 
     test('passes query parameters', () async {
-      when(() => mockDio.get(
-            any(),
-            queryParameters: any(named: 'queryParameters'),
-            options: any(named: 'options'),
-          )).thenAnswer(
-        (_) async => createResponse(statusCode: 200, data: null),
-      );
+      when(
+        () => mockDio.get(
+          any(),
+          queryParameters: any(named: 'queryParameters'),
+          options: any(named: 'options'),
+        ),
+      ).thenAnswer((_) async => createResponse(statusCode: 200, data: null));
 
       await service.get('/test', queryParameters: {'q': 'search'});
 
-      verify(() => mockDio.get(
-            '/test',
-            queryParameters: {'q': 'search'},
-            options: null,
-          )).called(1);
+      verify(
+        () => mockDio.get(
+          '/test',
+          queryParameters: {'q': 'search'},
+          options: null,
+        ),
+      ).called(1);
     });
 
     test('passes headers via Options', () async {
-      when(() => mockDio.get(
-            any(),
-            queryParameters: any(named: 'queryParameters'),
-            options: any(named: 'options'),
-          )).thenAnswer(
-        (_) async => createResponse(statusCode: 200, data: null),
-      );
+      when(
+        () => mockDio.get(
+          any(),
+          queryParameters: any(named: 'queryParameters'),
+          options: any(named: 'options'),
+        ),
+      ).thenAnswer((_) async => createResponse(statusCode: 200, data: null));
 
       await service.get('/test', headers: {'Authorization': 'Bearer token'});
 
-      verify(() => mockDio.get(
-            '/test',
-            queryParameters: null,
-            options: any(named: 'options', that: isA<Options>()),
-          )).called(1);
+      verify(
+        () => mockDio.get(
+          '/test',
+          queryParameters: null,
+          options: any(named: 'options', that: isA<Options>()),
+        ),
+      ).called(1);
     });
 
     test('throws HttpException on DioException', () async {
-      when(() => mockDio.get(
-                any(),
-                queryParameters: any(named: 'queryParameters'),
-                options: any(named: 'options'),
-              ))
-          .thenThrow(createDioException(statusCode: 404, message: 'Not found'));
+      when(
+        () => mockDio.get(
+          any(),
+          queryParameters: any(named: 'queryParameters'),
+          options: any(named: 'options'),
+        ),
+      ).thenThrow(createDioException(statusCode: 404, message: 'Not found'));
 
       expect(
         () => service.get('/test'),
-        throwsA(isA<HttpException>()
-            .having((e) => e.statusCode, 'statusCode', 404)
-            .having((e) => e.message, 'message', 'Not found')),
+        throwsA(
+          isA<HttpException>()
+              .having((e) => e.statusCode, 'statusCode', 404)
+              .having((e) => e.message, 'message', 'Not found'),
+        ),
       );
     });
   });
 
   group('post', () {
     test('returns HttpResponse on success', () async {
-      when(() => mockDio.post(
-            any(),
-            data: any(named: 'data'),
-            options: any(named: 'options'),
-          )).thenAnswer(
+      when(
+        () => mockDio.post(
+          any(),
+          data: any(named: 'data'),
+          options: any(named: 'options'),
+        ),
+      ).thenAnswer(
         (_) async => createResponse(statusCode: 201, data: {'id': 1}),
       );
 
@@ -136,11 +147,13 @@ void main() {
     });
 
     test('throws HttpException on DioException', () async {
-      when(() => mockDio.post(
-            any(),
-            data: any(named: 'data'),
-            options: any(named: 'options'),
-          )).thenThrow(createDioException(statusCode: 500, message: 'Error'));
+      when(
+        () => mockDio.post(
+          any(),
+          data: any(named: 'data'),
+          options: any(named: 'options'),
+        ),
+      ).thenThrow(createDioException(statusCode: 500, message: 'Error'));
 
       expect(
         () => service.post('/test', body: {}),
@@ -151,11 +164,13 @@ void main() {
 
   group('put', () {
     test('returns HttpResponse on success', () async {
-      when(() => mockDio.put(
-            any(),
-            data: any(named: 'data'),
-            options: any(named: 'options'),
-          )).thenAnswer(
+      when(
+        () => mockDio.put(
+          any(),
+          data: any(named: 'data'),
+          options: any(named: 'options'),
+        ),
+      ).thenAnswer(
         (_) async => createResponse(statusCode: 200, data: {'updated': true}),
       );
 
@@ -165,11 +180,13 @@ void main() {
     });
 
     test('throws HttpException on DioException', () async {
-      when(() => mockDio.put(
-            any(),
-            data: any(named: 'data'),
-            options: any(named: 'options'),
-          )).thenThrow(createDioException(statusCode: 500, message: 'Error'));
+      when(
+        () => mockDio.put(
+          any(),
+          data: any(named: 'data'),
+          options: any(named: 'options'),
+        ),
+      ).thenThrow(createDioException(statusCode: 500, message: 'Error'));
 
       expect(
         () => service.put('/test', body: {}),
@@ -180,12 +197,9 @@ void main() {
 
   group('delete', () {
     test('returns HttpResponse on success', () async {
-      when(() => mockDio.delete(
-            any(),
-            options: any(named: 'options'),
-          )).thenAnswer(
-        (_) async => createResponse(statusCode: 204, data: null),
-      );
+      when(
+        () => mockDio.delete(any(), options: any(named: 'options')),
+      ).thenAnswer((_) async => createResponse(statusCode: 204, data: null));
 
       final result = await service.delete('/test');
 
@@ -193,83 +207,90 @@ void main() {
     });
 
     test('passes headers', () async {
-      when(() => mockDio.delete(
-            any(),
-            options: any(named: 'options'),
-          )).thenAnswer(
-        (_) async => createResponse(statusCode: 200, data: null),
-      );
+      when(
+        () => mockDio.delete(any(), options: any(named: 'options')),
+      ).thenAnswer((_) async => createResponse(statusCode: 200, data: null));
 
       await service.delete('/test', headers: {'X-Custom': 'value'});
 
-      verify(() => mockDio.delete(
-            '/test',
-            options: any(named: 'options', that: isA<Options>()),
-          )).called(1);
+      verify(
+        () => mockDio.delete(
+          '/test',
+          options: any(named: 'options', that: isA<Options>()),
+        ),
+      ).called(1);
     });
 
     test('throws HttpException on DioException', () async {
-      when(() => mockDio.delete(
-            any(),
-            options: any(named: 'options'),
-          )).thenThrow(createDioException(statusCode: 500, message: 'Error'));
+      when(
+        () => mockDio.delete(any(), options: any(named: 'options')),
+      ).thenThrow(createDioException(statusCode: 500, message: 'Error'));
 
-      expect(
-        () => service.delete('/test'),
-        throwsA(isA<HttpException>()),
-      );
+      expect(() => service.delete('/test'), throwsA(isA<HttpException>()));
     });
   });
 
   group('post with headers', () {
     test('passes headers via Options', () async {
-      when(() => mockDio.post(
-            any(),
-            data: any(named: 'data'),
-            options: any(named: 'options'),
-          )).thenAnswer(
-        (_) async => createResponse(statusCode: 200, data: null),
+      when(
+        () => mockDio.post(
+          any(),
+          data: any(named: 'data'),
+          options: any(named: 'options'),
+        ),
+      ).thenAnswer((_) async => createResponse(statusCode: 200, data: null));
+
+      await service.post(
+        '/test',
+        body: {'a': 1},
+        headers: {'Authorization': 'Bearer token'},
       );
 
-      await service.post('/test',
-          body: {'a': 1}, headers: {'Authorization': 'Bearer token'});
-
-      verify(() => mockDio.post(
-            '/test',
-            data: {'a': 1},
-            options: any(named: 'options', that: isA<Options>()),
-          )).called(1);
+      verify(
+        () => mockDio.post(
+          '/test',
+          data: {'a': 1},
+          options: any(named: 'options', that: isA<Options>()),
+        ),
+      ).called(1);
     });
   });
 
   group('put with headers', () {
     test('passes headers via Options', () async {
-      when(() => mockDio.put(
-            any(),
-            data: any(named: 'data'),
-            options: any(named: 'options'),
-          )).thenAnswer(
-        (_) async => createResponse(statusCode: 200, data: null),
+      when(
+        () => mockDio.put(
+          any(),
+          data: any(named: 'data'),
+          options: any(named: 'options'),
+        ),
+      ).thenAnswer((_) async => createResponse(statusCode: 200, data: null));
+
+      await service.put(
+        '/test',
+        body: {'a': 1},
+        headers: {'Authorization': 'Bearer token'},
       );
 
-      await service.put('/test',
-          body: {'a': 1}, headers: {'Authorization': 'Bearer token'});
-
-      verify(() => mockDio.put(
-            '/test',
-            data: {'a': 1},
-            options: any(named: 'options', that: isA<Options>()),
-          )).called(1);
+      verify(
+        () => mockDio.put(
+          '/test',
+          data: {'a': 1},
+          options: any(named: 'options', that: isA<Options>()),
+        ),
+      ).called(1);
     });
   });
 
   group('upload', () {
     test('throws HttpException on DioException', () async {
-      when(() => mockDio.post(
-            any(),
-            data: any(named: 'data'),
-            options: any(named: 'options'),
-          )).thenThrow(createDioException(statusCode: 500, message: 'Error'));
+      when(
+        () => mockDio.post(
+          any(),
+          data: any(named: 'data'),
+          options: any(named: 'options'),
+        ),
+      ).thenThrow(createDioException(statusCode: 500, message: 'Error'));
 
       expect(
         () => service.upload('/upload', filePath: '/nonexistent/file.txt'),
@@ -280,29 +301,37 @@ void main() {
 
   group('_toException edge cases', () {
     test('handles null message in DioException', () async {
-      when(() => mockDio.get(
-            any(),
-            queryParameters: any(named: 'queryParameters'),
-            options: any(named: 'options'),
-          )).thenThrow(DioException(
-        requestOptions: RequestOptions(path: '/test'),
-        message: null,
-      ));
+      when(
+        () => mockDio.get(
+          any(),
+          queryParameters: any(named: 'queryParameters'),
+          options: any(named: 'options'),
+        ),
+      ).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(path: '/test'),
+          message: null,
+        ),
+      );
 
       expect(
         () => service.get('/test'),
-        throwsA(isA<HttpException>()
-            .having((e) => e.message, 'message', 'Unknown error')
-            .having((e) => e.statusCode, 'statusCode', isNull)),
+        throwsA(
+          isA<HttpException>()
+              .having((e) => e.message, 'message', 'Unknown error')
+              .having((e) => e.statusCode, 'statusCode', isNull),
+        ),
       );
     });
 
     test('handles null statusCode in response', () async {
-      when(() => mockDio.get(
-            any(),
-            queryParameters: any(named: 'queryParameters'),
-            options: any(named: 'options'),
-          )).thenAnswer(
+      when(
+        () => mockDio.get(
+          any(),
+          queryParameters: any(named: 'queryParameters'),
+          options: any(named: 'options'),
+        ),
+      ).thenAnswer(
         (_) async => Response(
           statusCode: null,
           data: 'data',

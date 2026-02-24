@@ -43,18 +43,11 @@ class TodoRepositoryImpl implements TodoRepository {
   }
 
   @override
-  Future<Todo> createTodo({
-    required String title,
-    required int userId,
-  }) async {
+  Future<Todo> createTodo({required String title, required int userId}) async {
     try {
       final response = await _http.post(
         '/todos',
-        body: {
-          'title': title,
-          'userId': userId,
-          'completed': false,
-        },
+        body: {'title': title, 'userId': userId, 'completed': false},
       );
       return Todo.fromJson(response.data as Map<String, dynamic>);
     } on HttpException catch (e) {

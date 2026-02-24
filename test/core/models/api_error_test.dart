@@ -38,10 +38,7 @@ void main() {
     });
 
     test('fromJson handles null detail', () {
-      final json = {
-        'statusCode': 404,
-        'message': 'Not found',
-      };
+      final json = {'statusCode': 404, 'message': 'Not found'};
 
       final error = ApiError.fromJson(json);
 

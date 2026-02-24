@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -19,21 +18,16 @@ GoRouter goRouter(Ref ref) {
     initialLocation: '/',
     routes: [
       // Feature非依存のルート
-      GoRoute(
-        path: '/splash',
-        builder: (_, __) => const SplashPage(),
-      ),
+      GoRoute(path: '/splash', builder: (_, _) => const SplashPage()),
 
       // メインルート
       GoRoute(
         path: '/',
-        builder: (_, __) => const TodoListPage(),
-        routes: [
-          ...todoRoutes(),
-        ],
+        builder: (_, _) => const TodoListPage(),
+        routes: [...todoRoutes()],
       ),
     ],
-    errorBuilder: (_, __) => const NotFoundPage(),
+    errorBuilder: (_, _) => const NotFoundPage(),
   );
 }
 

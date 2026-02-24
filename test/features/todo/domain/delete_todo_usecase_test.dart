@@ -40,8 +40,9 @@ void main() {
     });
 
     test('returns Failure with generic message on unexpected error', () async {
-      when(() => mockRepository.deleteTodo(1))
-          .thenThrow(Exception('Network error'));
+      when(
+        () => mockRepository.deleteTodo(1),
+      ).thenThrow(Exception('Network error'));
 
       final result = await useCase(1);
 

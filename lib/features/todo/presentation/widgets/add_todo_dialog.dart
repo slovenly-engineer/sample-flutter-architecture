@@ -17,9 +17,7 @@ class AddTodoDialog extends HookConsumerWidget {
       content: TextField(
         controller: controller,
         autofocus: true,
-        decoration: const InputDecoration(
-          hintText: 'Enter todo title',
-        ),
+        decoration: const InputDecoration(hintText: 'Enter todo title'),
         onChanged: (value) {
           isValid.value = value.trim().isNotEmpty;
         },

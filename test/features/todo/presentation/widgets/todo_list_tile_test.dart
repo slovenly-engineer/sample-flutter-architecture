@@ -19,8 +19,12 @@ void main() {
   late MockAppNavigator mockAppNavigator;
 
   const activeTodo = Todo(id: 1, userId: 1, title: 'Active Todo');
-  const completedTodo =
-      Todo(id: 2, userId: 1, title: 'Completed Todo', completed: true);
+  const completedTodo = Todo(
+    id: 2,
+    userId: 1,
+    title: 'Completed Todo',
+    completed: true,
+  );
 
   setUp(() {
     mockGetTodosUseCase = MockGetTodosUseCase();
@@ -30,7 +34,8 @@ void main() {
     mockAppNavigator = MockAppNavigator();
 
     when(() => mockGetTodosUseCase.call()).thenAnswer(
-        (_) async => const Result.success([activeTodo, completedTodo]));
+      (_) async => const Result.success([activeTodo, completedTodo]),
+    );
   });
 
   setUpAll(() {
@@ -49,9 +54,7 @@ void main() {
       child: MaterialApp(
         theme: AppTheme.light,
         home: Scaffold(
-          body: ListView(
-            children: [TodoListTile(todo: todo)],
-          ),
+          body: ListView(children: [TodoListTile(todo: todo)]),
         ),
       ),
     );
@@ -98,10 +101,9 @@ void main() {
     });
 
     testWidgets('tapping checkbox calls toggleTodo', (tester) async {
-      when(() => mockToggleTodoUseCase.call(any()))
-          .thenAnswer((_) async => Result.success(
-                activeTodo.copyWith(completed: true),
-              ));
+      when(() => mockToggleTodoUseCase.call(any())).thenAnswer(
+        (_) async => Result.success(activeTodo.copyWith(completed: true)),
+      );
 
       await tester.pumpWidget(createWidget(activeTodo));
       await tester.pumpAndSettle();
@@ -123,8 +125,9 @@ void main() {
     });
 
     testWidgets('swiping triggers removeTodo', (tester) async {
-      when(() => mockDeleteTodoUseCase.call(1))
-          .thenAnswer((_) async => const Result.success(null));
+      when(
+        () => mockDeleteTodoUseCase.call(1),
+      ).thenAnswer((_) async => const Result.success(null));
 
       await tester.pumpWidget(createWidget(activeTodo));
       await tester.pumpAndSettle();

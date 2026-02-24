@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/models/result.dart';
@@ -54,9 +53,7 @@ class TodoListNotifier extends _$TodoListNotifier {
 
     switch (result) {
       case Success():
-        state = AsyncData(
-          state.value!.where((t) => t.id != id).toList(),
-        );
+        state = AsyncData(state.value!.where((t) => t.id != id).toList());
       case Failure(:final error):
         throw Exception(error.message);
     }
@@ -75,8 +72,8 @@ class TodoFilterNotifier extends _$TodoFilterNotifier {
 
 @riverpod
 List<Todo> filteredTodos(Ref ref) {
-  final todosAsync = ref.watch(todoListNotifierProvider);
-  final filter = ref.watch(todoFilterNotifierProvider);
+  final todosAsync = ref.watch(todoListProvider);
+  final filter = ref.watch(todoFilterProvider);
 
   return todosAsync.when(
     data: (todos) => switch (filter) {
@@ -85,13 +82,13 @@ List<Todo> filteredTodos(Ref ref) {
       TodoFilter.completed => todos.where((t) => t.completed).toList(),
     },
     loading: () => [],
-    error: (_, __) => [],
+    error: (_, _) => [],
   );
 }
 
 @riverpod
 TodoStats todoStats(Ref ref) {
-  final todosAsync = ref.watch(todoListNotifierProvider);
+  final todosAsync = ref.watch(todoListProvider);
 
   return todosAsync.when(
     data: (todos) => TodoStats(
@@ -100,7 +97,7 @@ TodoStats todoStats(Ref ref) {
       active: todos.where((t) => !t.completed).length,
     ),
     loading: () => const TodoStats(total: 0, completed: 0, active: 0),
-    error: (_, __) => const TodoStats(total: 0, completed: 0, active: 0),
+    error: (_, _) => const TodoStats(total: 0, completed: 0, active: 0),
   );
 }
 

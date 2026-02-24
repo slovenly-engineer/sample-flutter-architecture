@@ -22,21 +22,22 @@ class TodoListTile extends HookConsumerWidget {
         child: const Icon(Icons.delete, color: Colors.white),
       ),
       onDismissed: (_) {
-        ref.read(todoListNotifierProvider.notifier).removeTodo(todo.id);
+        ref.read(todoListProvider.notifier).removeTodo(todo.id);
       },
       child: ListTile(
         leading: Checkbox(
           value: todo.completed,
           onChanged: (_) {
-            ref.read(todoListNotifierProvider.notifier).toggleTodo(todo);
+            ref.read(todoListProvider.notifier).toggleTodo(todo);
           },
         ),
         title: Text(
           todo.title,
           style: TextStyle(
             decoration: todo.completed ? TextDecoration.lineThrough : null,
-            color:
-                todo.completed ? Theme.of(context).colorScheme.outline : null,
+            color: todo.completed
+                ? Theme.of(context).colorScheme.outline
+                : null,
           ),
         ),
         onTap: () =>
