@@ -13,6 +13,6 @@ Future<Todo> todoDetail(Ref ref, int id) async {
 
   return switch (result) {
     Success(:final data) => data,
-    Failure(:final error) => throw Exception(error.message),
+    Failure(:final error) => throw error,
   };
 }

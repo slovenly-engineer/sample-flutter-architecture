@@ -74,12 +74,11 @@ void main() {
       final sub = container.listen(todoListProvider, (_, _) {});
 
       // Wait for async resolution
-      await Future<void>.delayed(Duration.zero);
-      await Future<void>.delayed(Duration.zero);
+      await pumpEventQueue();
 
       final state = sub.read();
       expect(state.hasError, isTrue);
-      expect(state.error, isA<Exception>());
+      expect(state.error, isA<ApiError>());
 
       sub.close();
     });
@@ -175,7 +174,7 @@ void main() {
       expect(
         () =>
             container.read(todoListProvider.notifier).toggleTodo(testTodos[0]),
-        throwsA(isA<Exception>()),
+        throwsA(isA<ApiError>()),
       );
     });
 
@@ -202,7 +201,7 @@ void main() {
 
       expect(
         () => container.read(todoListProvider.notifier).addTodo('Fail Todo'),
-        throwsA(isA<Exception>()),
+        throwsA(isA<ApiError>()),
       );
     });
 
@@ -224,7 +223,7 @@ void main() {
 
       expect(
         () => container.read(todoListProvider.notifier).removeTodo(1),
-        throwsA(isA<Exception>()),
+        throwsA(isA<ApiError>()),
       );
     });
   });

@@ -16,7 +16,7 @@ class TodoListNotifier extends _$TodoListNotifier {
 
     return switch (result) {
       Success(:final data) => data,
-      Failure(:final error) => throw Exception(error.message),
+      Failure(:final error) => throw error,
     };
   }
 
@@ -31,7 +31,7 @@ class TodoListNotifier extends _$TodoListNotifier {
         );
       case Failure(:final error):
         // Preserve current state, rethrow for UI to handle
-        throw Exception(error.message);
+        throw error;
     }
   }
 
@@ -43,7 +43,7 @@ class TodoListNotifier extends _$TodoListNotifier {
       case Success(:final data):
         state = AsyncData([data, ...state.value!]);
       case Failure(:final error):
-        throw Exception(error.message);
+        throw error;
     }
   }
 
@@ -55,7 +55,7 @@ class TodoListNotifier extends _$TodoListNotifier {
       case Success():
         state = AsyncData(state.value!.where((t) => t.id != id).toList());
       case Failure(:final error):
-        throw Exception(error.message);
+        throw error;
     }
   }
 }
