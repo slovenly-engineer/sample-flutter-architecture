@@ -19,8 +19,9 @@ void main() {
   group('todoDetailProvider', () {
     test('returns todo on success', () async {
       const todo = Todo(id: 1, userId: 1, title: 'Test');
-      when(() => mockUseCase.call(1))
-          .thenAnswer((_) async => const Result.success(todo));
+      when(
+        () => mockUseCase.call(1),
+      ).thenAnswer((_) async => const Result.success(todo));
 
       final container = ProviderContainer(
         overrides: [
@@ -48,10 +49,16 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      expect(
-        () => container.read(todoDetailProvider(1).future),
-        throwsA(isA<Exception>()),
-      );
+      final sub = container.listen(todoDetailProvider(1), (_, _) {});
+
+      // Wait for async resolution
+      await pumpEventQueue();
+
+      final state = sub.read();
+      expect(state.hasError, isTrue);
+      expect(state.error, isA<ApiError>());
+
+      sub.close();
     });
 
     test('provider equality based on id', () {

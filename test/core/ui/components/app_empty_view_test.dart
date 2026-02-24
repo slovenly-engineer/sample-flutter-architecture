@@ -7,9 +7,7 @@ import '../../../helpers/test_app.dart';
 void main() {
   testWidgets('AppEmptyView shows message and default icon', (tester) async {
     await tester.pumpWidget(
-      createTestAppWithScaffold(
-        const AppEmptyView(message: 'No items'),
-      ),
+      createTestAppWithScaffold(const AppEmptyView(message: 'No items')),
     );
 
     expect(find.text('No items'), findsOneWidget);
@@ -19,10 +17,7 @@ void main() {
   testWidgets('AppEmptyView shows custom icon', (tester) async {
     await tester.pumpWidget(
       createTestAppWithScaffold(
-        const AppEmptyView(
-          message: 'Empty',
-          icon: Icons.checklist,
-        ),
+        const AppEmptyView(message: 'Empty', icon: Icons.checklist),
       ),
     );
 
@@ -34,10 +29,7 @@ void main() {
       createTestAppWithScaffold(
         AppEmptyView(
           message: 'Empty',
-          action: ElevatedButton(
-            onPressed: () {},
-            child: const Text('Add'),
-          ),
+          action: ElevatedButton(onPressed: () {}, child: const Text('Add')),
         ),
       ),
     );

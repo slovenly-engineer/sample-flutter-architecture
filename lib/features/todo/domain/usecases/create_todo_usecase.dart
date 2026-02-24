@@ -14,10 +14,7 @@ class CreateTodoUseCase {
   }) async {
     if (title.trim().isEmpty) {
       return const Result.failure(
-        ApiError(
-          statusCode: 400,
-          message: 'Title cannot be empty',
-        ),
+        ApiError(statusCode: 400, message: 'Title cannot be empty'),
       );
     }
 

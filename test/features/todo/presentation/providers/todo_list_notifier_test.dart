@@ -45,20 +45,18 @@ void main() {
 
   group('TodoListNotifier', () {
     test('build fetches todos successfully', () async {
-      when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) async => Result.success(testTodos));
+      when(
+        () => mockGetTodosUseCase.call(),
+      ).thenAnswer((_) async => Result.success(testTodos));
 
       final container = createContainer();
       addTearDown(container.dispose);
 
       // Trigger the provider
-      final subscription = container.listen(
-        todoListNotifierProvider,
-        (_, __) {},
-      );
+      final subscription = container.listen(todoListProvider, (_, _) {});
 
       // Wait for async resolution
-      await container.read(todoListNotifierProvider.future);
+      await container.read(todoListProvider.future);
 
       final state = subscription.read();
       expect(state.value, testTodos);
@@ -66,88 +64,101 @@ void main() {
 
     test('build throws on failure', () async {
       when(() => mockGetTodosUseCase.call()).thenAnswer(
-        (_) async => const Result.failure(
-          ApiError(statusCode: 500, message: 'Error'),
-        ),
+        (_) async =>
+            const Result.failure(ApiError(statusCode: 500, message: 'Error')),
       );
 
       final container = createContainer();
       addTearDown(container.dispose);
 
-      expect(
-        () => container.read(todoListNotifierProvider.future),
-        throwsA(isA<Exception>()),
-      );
+      final sub = container.listen(todoListProvider, (_, _) {});
+
+      // Wait for async resolution
+      await pumpEventQueue();
+
+      final state = sub.read();
+      expect(state.hasError, isTrue);
+      expect(state.error, isA<ApiError>());
+
+      sub.close();
     });
 
     test('toggleTodo updates the todo in state', () async {
-      when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) async => Result.success(testTodos));
+      when(
+        () => mockGetTodosUseCase.call(),
+      ).thenAnswer((_) async => Result.success(testTodos));
 
-      const toggledTodo =
-          Todo(id: 1, userId: 1, title: 'Todo 1', completed: true);
-      when(() => mockToggleTodoUseCase.call(any()))
-          .thenAnswer((_) async => const Result.success(toggledTodo));
+      const toggledTodo = Todo(
+        id: 1,
+        userId: 1,
+        title: 'Todo 1',
+        completed: true,
+      );
+      when(
+        () => mockToggleTodoUseCase.call(any()),
+      ).thenAnswer((_) async => const Result.success(toggledTodo));
 
       final container = createContainer();
       addTearDown(container.dispose);
 
-      await container.read(todoListNotifierProvider.future);
+      await container.read(todoListProvider.future);
 
-      await container
-          .read(todoListNotifierProvider.notifier)
-          .toggleTodo(testTodos[0]);
+      await container.read(todoListProvider.notifier).toggleTodo(testTodos[0]);
 
-      final state = await container.read(todoListNotifierProvider.future);
+      final state = await container.read(todoListProvider.future);
       expect(state.first.completed, true);
     });
 
     test('addTodo prepends the new todo', () async {
-      when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) async => Result.success(testTodos));
+      when(
+        () => mockGetTodosUseCase.call(),
+      ).thenAnswer((_) async => Result.success(testTodos));
 
       const newTodo = Todo(id: 3, userId: 1, title: 'New Todo');
-      when(() => mockCreateTodoUseCase.call(
-            title: any(named: 'title'),
-            userId: any(named: 'userId'),
-          )).thenAnswer((_) async => const Result.success(newTodo));
+      when(
+        () => mockCreateTodoUseCase.call(
+          title: any(named: 'title'),
+          userId: any(named: 'userId'),
+        ),
+      ).thenAnswer((_) async => const Result.success(newTodo));
 
       final container = createContainer();
       addTearDown(container.dispose);
 
-      await container.read(todoListNotifierProvider.future);
+      await container.read(todoListProvider.future);
 
-      await container
-          .read(todoListNotifierProvider.notifier)
-          .addTodo('New Todo');
+      await container.read(todoListProvider.notifier).addTodo('New Todo');
 
-      final state = await container.read(todoListNotifierProvider.future);
+      final state = await container.read(todoListProvider.future);
       expect(state.length, 3);
       expect(state.first.title, 'New Todo');
     });
 
     test('removeTodo removes the todo from state', () async {
-      when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) async => Result.success(testTodos));
+      when(
+        () => mockGetTodosUseCase.call(),
+      ).thenAnswer((_) async => Result.success(testTodos));
 
-      when(() => mockDeleteTodoUseCase.call(any()))
-          .thenAnswer((_) async => const Result.success(null));
+      when(
+        () => mockDeleteTodoUseCase.call(any()),
+      ).thenAnswer((_) async => const Result.success(null));
 
       final container = createContainer();
       addTearDown(container.dispose);
 
-      await container.read(todoListNotifierProvider.future);
+      await container.read(todoListProvider.future);
 
-      await container.read(todoListNotifierProvider.notifier).removeTodo(1);
+      await container.read(todoListProvider.notifier).removeTodo(1);
 
-      final state = await container.read(todoListNotifierProvider.future);
+      final state = await container.read(todoListProvider.future);
       expect(state.length, 1);
       expect(state.first.id, 2);
     });
 
     test('toggleTodo throws on failure', () async {
-      when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) async => Result.success(testTodos));
+      when(
+        () => mockGetTodosUseCase.call(),
+      ).thenAnswer((_) async => Result.success(testTodos));
 
       when(() => mockToggleTodoUseCase.call(any())).thenAnswer(
         (_) async => const Result.failure(
@@ -158,24 +169,26 @@ void main() {
       final container = createContainer();
       addTearDown(container.dispose);
 
-      await container.read(todoListNotifierProvider.future);
+      await container.read(todoListProvider.future);
 
       expect(
-        () => container
-            .read(todoListNotifierProvider.notifier)
-            .toggleTodo(testTodos[0]),
-        throwsA(isA<Exception>()),
+        () =>
+            container.read(todoListProvider.notifier).toggleTodo(testTodos[0]),
+        throwsA(isA<ApiError>()),
       );
     });
 
     test('addTodo throws on failure', () async {
-      when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) async => Result.success(testTodos));
+      when(
+        () => mockGetTodosUseCase.call(),
+      ).thenAnswer((_) async => Result.success(testTodos));
 
-      when(() => mockCreateTodoUseCase.call(
-            title: any(named: 'title'),
-            userId: any(named: 'userId'),
-          )).thenAnswer(
+      when(
+        () => mockCreateTodoUseCase.call(
+          title: any(named: 'title'),
+          userId: any(named: 'userId'),
+        ),
+      ).thenAnswer(
         (_) async => const Result.failure(
           ApiError(statusCode: 500, message: 'Create failed'),
         ),
@@ -184,19 +197,18 @@ void main() {
       final container = createContainer();
       addTearDown(container.dispose);
 
-      await container.read(todoListNotifierProvider.future);
+      await container.read(todoListProvider.future);
 
       expect(
-        () => container
-            .read(todoListNotifierProvider.notifier)
-            .addTodo('Fail Todo'),
-        throwsA(isA<Exception>()),
+        () => container.read(todoListProvider.notifier).addTodo('Fail Todo'),
+        throwsA(isA<ApiError>()),
       );
     });
 
     test('removeTodo throws on failure', () async {
-      when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) async => Result.success(testTodos));
+      when(
+        () => mockGetTodosUseCase.call(),
+      ).thenAnswer((_) async => Result.success(testTodos));
 
       when(() => mockDeleteTodoUseCase.call(any())).thenAnswer(
         (_) async => const Result.failure(
@@ -207,11 +219,11 @@ void main() {
       final container = createContainer();
       addTearDown(container.dispose);
 
-      await container.read(todoListNotifierProvider.future);
+      await container.read(todoListProvider.future);
 
       expect(
-        () => container.read(todoListNotifierProvider.notifier).removeTodo(1),
-        throwsA(isA<Exception>()),
+        () => container.read(todoListProvider.notifier).removeTodo(1),
+        throwsA(isA<ApiError>()),
       );
     });
   });
@@ -221,7 +233,7 @@ void main() {
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
-      final filter = container.read(todoFilterNotifierProvider);
+      final filter = container.read(todoFilterProvider);
       expect(filter, TodoFilter.all);
     });
 
@@ -229,40 +241,38 @@ void main() {
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
-      container
-          .read(todoFilterNotifierProvider.notifier)
-          .setFilter(TodoFilter.active);
+      container.read(todoFilterProvider.notifier).setFilter(TodoFilter.active);
 
-      expect(container.read(todoFilterNotifierProvider), TodoFilter.active);
+      expect(container.read(todoFilterProvider), TodoFilter.active);
     });
   });
 
   group('filteredTodos', () {
     test('returns all todos with TodoFilter.all', () async {
-      when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) async => Result.success(testTodos));
+      when(
+        () => mockGetTodosUseCase.call(),
+      ).thenAnswer((_) async => Result.success(testTodos));
 
       final container = createContainer();
       addTearDown(container.dispose);
 
-      await container.read(todoListNotifierProvider.future);
+      await container.read(todoListProvider.future);
 
       final filtered = container.read(filteredTodosProvider);
       expect(filtered.length, 2);
     });
 
     test('returns only active todos with TodoFilter.active', () async {
-      when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) async => Result.success(testTodos));
+      when(
+        () => mockGetTodosUseCase.call(),
+      ).thenAnswer((_) async => Result.success(testTodos));
 
       final container = createContainer();
       addTearDown(container.dispose);
 
-      await container.read(todoListNotifierProvider.future);
+      await container.read(todoListProvider.future);
 
-      container
-          .read(todoFilterNotifierProvider.notifier)
-          .setFilter(TodoFilter.active);
+      container.read(todoFilterProvider.notifier).setFilter(TodoFilter.active);
 
       final filtered = container.read(filteredTodosProvider);
       expect(filtered.length, 1);
@@ -270,16 +280,17 @@ void main() {
     });
 
     test('returns only completed todos with TodoFilter.completed', () async {
-      when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) async => Result.success(testTodos));
+      when(
+        () => mockGetTodosUseCase.call(),
+      ).thenAnswer((_) async => Result.success(testTodos));
 
       final container = createContainer();
       addTearDown(container.dispose);
 
-      await container.read(todoListNotifierProvider.future);
+      await container.read(todoListProvider.future);
 
       container
-          .read(todoFilterNotifierProvider.notifier)
+          .read(todoFilterProvider.notifier)
           .setFilter(TodoFilter.completed);
 
       final filtered = container.read(filteredTodosProvider);
@@ -288,8 +299,9 @@ void main() {
     });
 
     test('returns empty when loading', () {
-      when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) async => Result.success(testTodos));
+      when(
+        () => mockGetTodosUseCase.call(),
+      ).thenAnswer((_) async => Result.success(testTodos));
 
       final container = createContainer();
       addTearDown(container.dispose);
@@ -302,13 +314,14 @@ void main() {
 
   group('todoStats', () {
     test('returns correct stats', () async {
-      when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) async => Result.success(testTodos));
+      when(
+        () => mockGetTodosUseCase.call(),
+      ).thenAnswer((_) async => Result.success(testTodos));
 
       final container = createContainer();
       addTearDown(container.dispose);
 
-      await container.read(todoListNotifierProvider.future);
+      await container.read(todoListProvider.future);
 
       final stats = container.read(todoStatsProvider);
       expect(stats.total, 2);
@@ -317,8 +330,9 @@ void main() {
     });
 
     test('returns zeros when loading', () {
-      when(() => mockGetTodosUseCase.call())
-          .thenAnswer((_) async => Result.success(testTodos));
+      when(
+        () => mockGetTodosUseCase.call(),
+      ).thenAnswer((_) async => Result.success(testTodos));
 
       final container = createContainer();
       addTearDown(container.dispose);

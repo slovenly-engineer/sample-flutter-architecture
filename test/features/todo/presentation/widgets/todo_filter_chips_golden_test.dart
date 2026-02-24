@@ -11,9 +11,7 @@ void main() {
     return createTestAppWithScaffold(
       const TodoFilterChips(),
       overrides: [
-        todoFilterNotifierProvider.overrideWith(
-          () => _TestFilterNotifier(filter),
-        ),
+        todoFilterProvider.overrideWith(() => _TestFilterNotifier(filter)),
       ],
     );
   }

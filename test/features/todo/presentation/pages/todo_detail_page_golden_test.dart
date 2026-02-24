@@ -12,8 +12,12 @@ import '../../../../helpers/test_app.dart';
 
 void main() {
   const activeTodo = Todo(id: 1, userId: 1, title: 'Buy groceries');
-  const completedTodo =
-      Todo(id: 2, userId: 1, title: 'Clean the house', completed: true);
+  const completedTodo = Todo(
+    id: 2,
+    userId: 1,
+    title: 'Clean the house',
+    completed: true,
+  );
 
   Widget createPage({
     required int todoId,
@@ -21,9 +25,7 @@ void main() {
   }) {
     return createTestApp(
       TodoDetailPage(todoId: todoId),
-      overrides: [
-        getTodoDetailUseCaseProvider.overrideWith((ref) => mock),
-      ],
+      overrides: [getTodoDetailUseCaseProvider.overrideWith((ref) => mock)],
     );
   }
 
@@ -32,12 +34,15 @@ void main() {
     fileName: 'todo_detail_page_active',
     builder: () {
       final mock = MockGetTodoDetailUseCase();
-      when(() => mock.call(1))
-          .thenAnswer((_) async => const Result.success(activeTodo));
+      when(
+        () => mock.call(1),
+      ).thenAnswer((_) async => const Result.success(activeTodo));
 
       return GoldenTestGroup(
-        scenarioConstraints:
-            const BoxConstraints(maxWidth: 400, maxHeight: 500),
+        scenarioConstraints: const BoxConstraints(
+          maxWidth: 400,
+          maxHeight: 500,
+        ),
         children: [
           GoldenTestScenario(
             name: 'active todo',
@@ -53,12 +58,15 @@ void main() {
     fileName: 'todo_detail_page_completed',
     builder: () {
       final mock = MockGetTodoDetailUseCase();
-      when(() => mock.call(2))
-          .thenAnswer((_) async => const Result.success(completedTodo));
+      when(
+        () => mock.call(2),
+      ).thenAnswer((_) async => const Result.success(completedTodo));
 
       return GoldenTestGroup(
-        scenarioConstraints:
-            const BoxConstraints(maxWidth: 400, maxHeight: 500),
+        scenarioConstraints: const BoxConstraints(
+          maxWidth: 400,
+          maxHeight: 500,
+        ),
         children: [
           GoldenTestScenario(
             name: 'completed todo',
@@ -81,8 +89,10 @@ void main() {
       );
 
       return GoldenTestGroup(
-        scenarioConstraints:
-            const BoxConstraints(maxWidth: 400, maxHeight: 500),
+        scenarioConstraints: const BoxConstraints(
+          maxWidth: 400,
+          maxHeight: 500,
+        ),
         children: [
           GoldenTestScenario(
             name: 'error',

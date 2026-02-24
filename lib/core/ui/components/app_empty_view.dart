@@ -22,18 +22,14 @@ class AppEmptyView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 64,
-              color: Theme.of(context).colorScheme.outline,
-            ),
+            Icon(icon, size: 64, color: Theme.of(context).colorScheme.outline),
             const SizedBox(height: AppSpacing.md),
             Text(
               message,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
+                color: Theme.of(context).colorScheme.outline,
+              ),
             ),
             if (action != null) ...[
               const SizedBox(height: AppSpacing.md),

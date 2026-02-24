@@ -19,10 +19,7 @@ abstract class HttpClientService {
     Map<String, String>? headers,
   });
 
-  Future<HttpResponse> delete(
-    String path, {
-    Map<String, String>? headers,
-  });
+  Future<HttpResponse> delete(String path, {Map<String, String>? headers});
 
   Future<HttpResponse> upload(
     String path, {
@@ -47,11 +44,7 @@ class HttpResponse {
 
 /// パッケージ非依存のHTTP例外
 class HttpException implements Exception {
-  const HttpException({
-    this.statusCode,
-    required this.message,
-    this.data,
-  });
+  const HttpException({this.statusCode, required this.message, this.data});
 
   final int? statusCode;
   final String message;

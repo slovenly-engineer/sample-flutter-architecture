@@ -11,16 +11,11 @@ void main() {
       children: [
         GoldenTestScenario(
           name: 'with retry button',
-          child: AppErrorView(
-            message: 'Something went wrong',
-            onRetry: () {},
-          ),
+          child: AppErrorView(message: 'Something went wrong', onRetry: () {}),
         ),
         GoldenTestScenario(
           name: 'without retry button',
-          child: const AppErrorView(
-            message: 'An error occurred',
-          ),
+          child: const AppErrorView(message: 'An error occurred'),
         ),
       ],
     ),

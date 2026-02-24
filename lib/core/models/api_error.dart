@@ -4,7 +4,7 @@ part 'api_error.freezed.dart';
 part 'api_error.g.dart';
 
 @freezed
-class ApiError with _$ApiError {
+abstract class ApiError with _$ApiError {
   const factory ApiError({
     required int statusCode,
     required String message,

@@ -18,9 +18,7 @@ void main() {
   });
 
   setUpAll(() {
-    registerFallbackValue(
-      const Todo(id: 0, userId: 0, title: ''),
-    );
+    registerFallbackValue(const Todo(id: 0, userId: 0, title: ''));
   });
 
   group('ToggleTodoUseCase', () {
@@ -28,8 +26,9 @@ void main() {
       const todo = Todo(id: 1, userId: 1, title: 'Test', completed: false);
       const toggled = Todo(id: 1, userId: 1, title: 'Test', completed: true);
 
-      when(() => mockRepository.updateTodo(any()))
-          .thenAnswer((_) async => toggled);
+      when(
+        () => mockRepository.updateTodo(any()),
+      ).thenAnswer((_) async => toggled);
 
       final result = await useCase(todo);
 
@@ -37,8 +36,9 @@ void main() {
       final data = (result as Success<Todo>).data;
       expect(data.completed, true);
 
-      final captured =
-          verify(() => mockRepository.updateTodo(captureAny())).captured;
+      final captured = verify(
+        () => mockRepository.updateTodo(captureAny()),
+      ).captured;
       expect((captured.first as Todo).completed, true);
     });
 
@@ -46,8 +46,9 @@ void main() {
       const todo = Todo(id: 1, userId: 1, title: 'Test', completed: true);
       const toggled = Todo(id: 1, userId: 1, title: 'Test', completed: false);
 
-      when(() => mockRepository.updateTodo(any()))
-          .thenAnswer((_) async => toggled);
+      when(
+        () => mockRepository.updateTodo(any()),
+      ).thenAnswer((_) async => toggled);
 
       final result = await useCase(todo);
 
@@ -59,9 +60,9 @@ void main() {
     test('returns Failure when repository throws ApiError', () async {
       const todo = Todo(id: 1, userId: 1, title: 'Test');
 
-      when(() => mockRepository.updateTodo(any())).thenThrow(
-        const ApiError(statusCode: 500, message: 'Update failed'),
-      );
+      when(
+        () => mockRepository.updateTodo(any()),
+      ).thenThrow(const ApiError(statusCode: 500, message: 'Update failed'));
 
       final result = await useCase(todo);
 
@@ -73,8 +74,9 @@ void main() {
     test('returns Failure with unexpected error', () async {
       const todo = Todo(id: 1, userId: 1, title: 'Test');
 
-      when(() => mockRepository.updateTodo(any()))
-          .thenThrow(Exception('network error'));
+      when(
+        () => mockRepository.updateTodo(any()),
+      ).thenThrow(Exception('network error'));
 
       final result = await useCase(todo);
 

@@ -11,21 +11,17 @@ class TodoEntity {
   });
 
   factory TodoEntity.fromModel(Todo todo) => TodoEntity(
-        id: todo.id,
-        userId: todo.userId,
-        title: todo.title,
-        completed: todo.completed,
-      );
+    id: todo.id,
+    userId: todo.userId,
+    title: todo.title,
+    completed: todo.completed,
+  );
 
   int id;
   int userId;
   String title;
   bool completed;
 
-  Todo toModel() => Todo(
-        id: id,
-        userId: userId,
-        title: title,
-        completed: completed,
-      );
+  Todo toModel() =>
+      Todo(id: id, userId: userId, title: title, completed: completed);
 }

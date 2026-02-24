@@ -13,9 +13,7 @@ class TodoListPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Todos'),
-      ),
+      appBar: AppBar(title: const Text('Todos')),
       body: const Column(
         children: [
           TodoStatsBar(),
@@ -36,7 +34,7 @@ class TodoListPage extends HookConsumerWidget {
       builder: (context) => const AddTodoDialog(),
     ).then((title) {
       if (title != null && title.isNotEmpty) {
-        ref.read(todoListNotifierProvider.notifier).addTodo(title);
+        ref.read(todoListProvider.notifier).addTodo(title);
       }
     });
   }

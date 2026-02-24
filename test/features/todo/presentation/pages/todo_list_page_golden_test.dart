@@ -26,9 +26,7 @@ void main() {
     const Todo(id: 3, userId: 1, title: 'Read a book'),
   ];
 
-  Widget createPage({
-    required MockGetTodosUseCase mockGetTodosUseCase,
-  }) {
+  Widget createPage({required MockGetTodosUseCase mockGetTodosUseCase}) {
     final mockToggle = MockToggleTodoUseCase();
     final mockCreate = MockCreateTodoUseCase();
     final mockDelete = MockDeleteTodoUseCase();
@@ -52,12 +50,15 @@ void main() {
     fileName: 'todo_list_page_with_data',
     builder: () {
       final mock = MockGetTodosUseCase();
-      when(() => mock.call())
-          .thenAnswer((_) async => Result.success(testTodos));
+      when(
+        () => mock.call(),
+      ).thenAnswer((_) async => Result.success(testTodos));
 
       return GoldenTestGroup(
-        scenarioConstraints:
-            const BoxConstraints(maxWidth: 400, maxHeight: 600),
+        scenarioConstraints: const BoxConstraints(
+          maxWidth: 400,
+          maxHeight: 600,
+        ),
         children: [
           GoldenTestScenario(
             name: 'with data',
@@ -80,8 +81,10 @@ void main() {
       );
 
       return GoldenTestGroup(
-        scenarioConstraints:
-            const BoxConstraints(maxWidth: 400, maxHeight: 600),
+        scenarioConstraints: const BoxConstraints(
+          maxWidth: 400,
+          maxHeight: 600,
+        ),
         children: [
           GoldenTestScenario(
             name: 'error',
@@ -100,8 +103,10 @@ void main() {
       when(() => mock.call()).thenAnswer((_) async => const Result.success([]));
 
       return GoldenTestGroup(
-        scenarioConstraints:
-            const BoxConstraints(maxWidth: 400, maxHeight: 600),
+        scenarioConstraints: const BoxConstraints(
+          maxWidth: 400,
+          maxHeight: 600,
+        ),
         children: [
           GoldenTestScenario(
             name: 'empty',

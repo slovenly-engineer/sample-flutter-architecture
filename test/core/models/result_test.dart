@@ -46,7 +46,9 @@ void main() {
 
         expect(result, isA<Failure<String>>());
         expect(
-            (result as Failure<String>).error.detail, 'Internal error details');
+          (result as Failure<String>).error.detail,
+          'Internal error details',
+        );
       });
     });
 

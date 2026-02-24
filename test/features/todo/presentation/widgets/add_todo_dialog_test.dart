@@ -31,8 +31,9 @@ void main() {
   }
 
   group('AddTodoDialog', () {
-    testWidgets('displays title, TextField, Cancel, and Add buttons',
-        (tester) async {
+    testWidgets('displays title, TextField, Cancel, and Add buttons', (
+      tester,
+    ) async {
       await openDialog(tester);
 
       expect(find.text('Add Todo'), findsOneWidget);
@@ -62,8 +63,9 @@ void main() {
       expect(addButton.onPressed, isNotNull);
     });
 
-    testWidgets('Add button is disabled for whitespace-only input',
-        (tester) async {
+    testWidgets('Add button is disabled for whitespace-only input', (
+      tester,
+    ) async {
       await openDialog(tester);
 
       await tester.enterText(find.byType(TextField), '   ');

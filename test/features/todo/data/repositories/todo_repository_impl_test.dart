@@ -45,9 +45,11 @@ void main() {
 
       expect(
         () => repository.getTodos(),
-        throwsA(isA<ApiError>()
-            .having((e) => e.statusCode, 'statusCode', 500)
-            .having((e) => e.message, 'message', 'Server error')),
+        throwsA(
+          isA<ApiError>()
+              .having((e) => e.statusCode, 'statusCode', 500)
+              .having((e) => e.message, 'message', 'Server error'),
+        ),
       );
     });
   });
@@ -67,36 +69,36 @@ void main() {
     });
 
     test('throws ApiError converted from HttpException on failure', () async {
-      when(() => mockHttp.get('/todos/1')).thenThrow(
-        const HttpException(statusCode: 404, message: 'Not found'),
-      );
+      when(
+        () => mockHttp.get('/todos/1'),
+      ).thenThrow(const HttpException(statusCode: 404, message: 'Not found'));
 
       expect(
         () => repository.getTodoById(1),
-        throwsA(isA<ApiError>()
-            .having((e) => e.statusCode, 'statusCode', 404)
-            .having((e) => e.message, 'message', 'Not found')),
+        throwsA(
+          isA<ApiError>()
+              .having((e) => e.statusCode, 'statusCode', 404)
+              .having((e) => e.message, 'message', 'Not found'),
+        ),
       );
     });
   });
 
   group('createTodo', () {
     test('returns created todo on success', () async {
-      when(() => mockHttp.post(
-            '/todos',
-            body: {
-              'title': 'New Todo',
-              'userId': 1,
-              'completed': false,
-            },
-          )).thenAnswer(
+      when(
+        () => mockHttp.post(
+          '/todos',
+          body: {'title': 'New Todo', 'userId': 1, 'completed': false},
+        ),
+      ).thenAnswer(
         (_) async => const HttpResponse(
           statusCode: 201,
           data: {
             'id': 201,
             'userId': 1,
             'title': 'New Todo',
-            'completed': false
+            'completed': false,
           },
         ),
       );
@@ -108,18 +110,17 @@ void main() {
     });
 
     test('throws ApiError converted from HttpException on failure', () async {
-      when(() => mockHttp.post(
-            '/todos',
-            body: any(named: 'body'),
-          )).thenThrow(
+      when(() => mockHttp.post('/todos', body: any(named: 'body'))).thenThrow(
         const HttpException(statusCode: 500, message: 'Server error'),
       );
 
       expect(
         () => repository.createTodo(title: 'New Todo', userId: 1),
-        throwsA(isA<ApiError>()
-            .having((e) => e.statusCode, 'statusCode', 500)
-            .having((e) => e.message, 'message', 'Server error')),
+        throwsA(
+          isA<ApiError>()
+              .having((e) => e.statusCode, 'statusCode', 500)
+              .having((e) => e.message, 'message', 'Server error'),
+        ),
       );
     });
   });
@@ -127,10 +128,7 @@ void main() {
   group('updateTodo', () {
     test('returns updated todo on success', () async {
       const todo = Todo(id: 1, userId: 1, title: 'Updated', completed: true);
-      when(() => mockHttp.put(
-            '/todos/1',
-            body: any(named: 'body'),
-          )).thenAnswer(
+      when(() => mockHttp.put('/todos/1', body: any(named: 'body'))).thenAnswer(
         (_) async => const HttpResponse(
           statusCode: 200,
           data: {'id': 1, 'userId': 1, 'title': 'Updated', 'completed': true},
@@ -144,18 +142,17 @@ void main() {
 
     test('throws ApiError converted from HttpException on failure', () async {
       const todo = Todo(id: 1, userId: 1, title: 'Test');
-      when(() => mockHttp.put(
-            '/todos/1',
-            body: any(named: 'body'),
-          )).thenThrow(
+      when(() => mockHttp.put('/todos/1', body: any(named: 'body'))).thenThrow(
         const HttpException(statusCode: 500, message: 'Server error'),
       );
 
       expect(
         () => repository.updateTodo(todo),
-        throwsA(isA<ApiError>()
-            .having((e) => e.statusCode, 'statusCode', 500)
-            .having((e) => e.message, 'message', 'Server error')),
+        throwsA(
+          isA<ApiError>()
+              .having((e) => e.statusCode, 'statusCode', 500)
+              .having((e) => e.message, 'message', 'Server error'),
+        ),
       );
     });
   });
@@ -178,9 +175,11 @@ void main() {
 
       expect(
         () => repository.deleteTodo(1),
-        throwsA(isA<ApiError>()
-            .having((e) => e.statusCode, 'statusCode', 500)
-            .having((e) => e.message, 'message', 'Server error')),
+        throwsA(
+          isA<ApiError>()
+              .having((e) => e.statusCode, 'statusCode', 500)
+              .having((e) => e.message, 'message', 'Server error'),
+        ),
       );
     });
   });

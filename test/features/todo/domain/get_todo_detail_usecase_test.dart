@@ -32,9 +32,9 @@ void main() {
     });
 
     test('returns Failure when repository throws ApiError', () async {
-      when(() => mockRepository.getTodoById(1)).thenThrow(
-        const ApiError(statusCode: 404, message: 'Todo not found'),
-      );
+      when(
+        () => mockRepository.getTodoById(1),
+      ).thenThrow(const ApiError(statusCode: 404, message: 'Todo not found'));
 
       final result = await useCase(1);
 
@@ -45,8 +45,9 @@ void main() {
     });
 
     test('returns Failure with generic message on unexpected error', () async {
-      when(() => mockRepository.getTodoById(1))
-          .thenThrow(Exception('Network error'));
+      when(
+        () => mockRepository.getTodoById(1),
+      ).thenThrow(Exception('Network error'));
 
       final result = await useCase(1);
 

@@ -12,8 +12,12 @@ import '../../../../helpers/mocks.dart';
 
 void main() {
   const activeTodo = Todo(id: 1, userId: 1, title: 'Buy groceries');
-  const completedTodo =
-      Todo(id: 2, userId: 1, title: 'Clean the house', completed: true);
+  const completedTodo = Todo(
+    id: 2,
+    userId: 1,
+    title: 'Clean the house',
+    completed: true,
+  );
 
   final mockGetTodosUseCase = MockGetTodosUseCase();
   final mockToggleTodoUseCase = MockToggleTodoUseCase();
@@ -21,8 +25,9 @@ void main() {
   final mockDeleteTodoUseCase = MockDeleteTodoUseCase();
   final mockAppNavigator = MockAppNavigator();
 
-  when(() => mockGetTodosUseCase.call()).thenAnswer(
-      (_) async => const Result.success([activeTodo, completedTodo]));
+  when(
+    () => mockGetTodosUseCase.call(),
+  ).thenAnswer((_) async => const Result.success([activeTodo, completedTodo]));
 
   Widget wrapWithProviders(Widget child) {
     return ProviderScope(
