@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sample_flutter_architecture/core/infrastructure/network/http_client_service.dart';
+import 'package:sample_flutter_architecture/core/models/api_error.dart';
 import 'package:sample_flutter_architecture/features/todo/data/repositories/todo_repository_impl.dart';
 import 'package:sample_flutter_architecture/features/todo/models/todo.dart';
 
@@ -37,14 +38,16 @@ void main() {
       expect(result.length, 2);
     });
 
-    test('throws HttpException on failure', () async {
+    test('throws ApiError converted from HttpException on failure', () async {
       when(() => mockHttp.get('/todos')).thenThrow(
         const HttpException(statusCode: 500, message: 'Server error'),
       );
 
       expect(
         () => repository.getTodos(),
-        throwsA(isA<HttpException>()),
+        throwsA(isA<ApiError>()
+            .having((e) => e.statusCode, 'statusCode', 500)
+            .having((e) => e.message, 'message', 'Server error')),
       );
     });
   });
@@ -63,14 +66,16 @@ void main() {
       expect(result, equals(const Todo(id: 1, userId: 1, title: 'Todo 1')));
     });
 
-    test('throws HttpException on failure', () async {
+    test('throws ApiError converted from HttpException on failure', () async {
       when(() => mockHttp.get('/todos/1')).thenThrow(
         const HttpException(statusCode: 404, message: 'Not found'),
       );
 
       expect(
         () => repository.getTodoById(1),
-        throwsA(isA<HttpException>()),
+        throwsA(isA<ApiError>()
+            .having((e) => e.statusCode, 'statusCode', 404)
+            .having((e) => e.message, 'message', 'Not found')),
       );
     });
   });
@@ -102,7 +107,7 @@ void main() {
       expect(result.id, 201);
     });
 
-    test('throws HttpException on failure', () async {
+    test('throws ApiError converted from HttpException on failure', () async {
       when(() => mockHttp.post(
             '/todos',
             body: any(named: 'body'),
@@ -112,7 +117,9 @@ void main() {
 
       expect(
         () => repository.createTodo(title: 'New Todo', userId: 1),
-        throwsA(isA<HttpException>()),
+        throwsA(isA<ApiError>()
+            .having((e) => e.statusCode, 'statusCode', 500)
+            .having((e) => e.message, 'message', 'Server error')),
       );
     });
   });
@@ -135,7 +142,7 @@ void main() {
       expect(result, equals(todo));
     });
 
-    test('throws HttpException on failure', () async {
+    test('throws ApiError converted from HttpException on failure', () async {
       const todo = Todo(id: 1, userId: 1, title: 'Test');
       when(() => mockHttp.put(
             '/todos/1',
@@ -146,7 +153,9 @@ void main() {
 
       expect(
         () => repository.updateTodo(todo),
-        throwsA(isA<HttpException>()),
+        throwsA(isA<ApiError>()
+            .having((e) => e.statusCode, 'statusCode', 500)
+            .having((e) => e.message, 'message', 'Server error')),
       );
     });
   });
@@ -162,14 +171,16 @@ void main() {
       verify(() => mockHttp.delete('/todos/1')).called(1);
     });
 
-    test('throws HttpException on failure', () async {
+    test('throws ApiError converted from HttpException on failure', () async {
       when(() => mockHttp.delete('/todos/1')).thenThrow(
         const HttpException(statusCode: 500, message: 'Server error'),
       );
 
       expect(
         () => repository.deleteTodo(1),
-        throwsA(isA<HttpException>()),
+        throwsA(isA<ApiError>()
+            .having((e) => e.statusCode, 'statusCode', 500)
+            .having((e) => e.message, 'message', 'Server error')),
       );
     });
   });
