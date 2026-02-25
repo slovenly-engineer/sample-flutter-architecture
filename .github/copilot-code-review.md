@@ -12,4 +12,4 @@ Flutter アプリケーション。Feature-First + Layered Architecture（Presen
 - **モデル**: Freezed による不変データモデルが適切に定義されているか
 - **API 層**: Retrofit + Dio のパターンに従っているか
 - **テスト**: テストカバレッジ 90% 以上を維持できるか
-- **コーディング規約**: flutter_lints、prefer_const_constructors、prefer_single_quotes に準拠しているか
+- **コーディング規約**: flutter_lints、`prefer_const_constructors`、`prefer_single_quotes` に準拠しているか
