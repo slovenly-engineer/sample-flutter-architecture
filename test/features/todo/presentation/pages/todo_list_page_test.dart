@@ -3,11 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:sample_flutter_architecture/core/infrastructure/navigation/navigation_provider.dart';
-import 'package:sample_flutter_architecture/core/models/api_error.dart';
-import 'package:sample_flutter_architecture/core/models/result.dart';
 import 'package:sample_flutter_architecture/features/todo/domain/providers/todo_providers.dart';
 import 'package:sample_flutter_architecture/features/todo/models/todo.dart';
+import 'package:sample_flutter_architecture/features/todo/presentation/actions/todo_list_action_provider.dart';
 import 'package:sample_flutter_architecture/features/todo/presentation/pages/todo_list_page.dart';
 import 'package:sample_flutter_architecture/features/todo/presentation/widgets/add_todo_dialog.dart';
 
@@ -15,11 +13,8 @@ import '../../../../helpers/mocks.dart';
 import '../../../../helpers/test_app.dart';
 
 void main() {
-  late MockGetTodosUseCase mockGetTodosUseCase;
-  late MockToggleTodoUseCase mockToggleTodoUseCase;
-  late MockCreateTodoUseCase mockCreateTodoUseCase;
-  late MockDeleteTodoUseCase mockDeleteTodoUseCase;
-  late MockAppNavigator mockAppNavigator;
+  late MockTodoRepository mockRepository;
+  late MockTodoListAction mockAction;
 
   final testTodos = [
     const Todo(id: 1, userId: 1, title: 'Todo 1'),
@@ -27,11 +22,8 @@ void main() {
   ];
 
   setUp(() {
-    mockGetTodosUseCase = MockGetTodosUseCase();
-    mockToggleTodoUseCase = MockToggleTodoUseCase();
-    mockCreateTodoUseCase = MockCreateTodoUseCase();
-    mockDeleteTodoUseCase = MockDeleteTodoUseCase();
-    mockAppNavigator = MockAppNavigator();
+    mockRepository = MockTodoRepository();
+    mockAction = MockTodoListAction();
   });
 
   setUpAll(() {
@@ -42,35 +34,28 @@ void main() {
     return createTestApp(
       const TodoListPage(),
       overrides: [
-        getTodosUseCaseProvider.overrideWith((ref) => mockGetTodosUseCase),
-        toggleTodoUseCaseProvider.overrideWith((ref) => mockToggleTodoUseCase),
-        createTodoUseCaseProvider.overrideWith((ref) => mockCreateTodoUseCase),
-        deleteTodoUseCaseProvider.overrideWith((ref) => mockDeleteTodoUseCase),
-        appNavigatorProvider.overrideWith((ref) => mockAppNavigator),
+        todoRepositoryProvider.overrideWith((ref) => mockRepository),
+        todoListActionProvider.overrideWith((ref) => mockAction),
       ],
     );
   }
 
   group('TodoListPage', () {
     testWidgets('shows loading indicator initially', (tester) async {
-      final completer = Completer<Result<List<Todo>>>();
-      when(
-        () => mockGetTodosUseCase.call(),
-      ).thenAnswer((_) => completer.future);
+      final completer = Completer<List<Todo>>();
+      when(() => mockRepository.getTodos()).thenAnswer((_) => completer.future);
 
       await tester.pumpWidget(createPage());
       await tester.pump();
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-      completer.complete(Result.success(testTodos));
+      completer.complete(testTodos);
       await tester.pumpAndSettle();
     });
 
     testWidgets('displays todos after loading', (tester) async {
-      when(
-        () => mockGetTodosUseCase.call(),
-      ).thenAnswer((_) async => Result.success(testTodos));
+      when(() => mockRepository.getTodos()).thenAnswer((_) async => testTodos);
 
       await tester.pumpWidget(createPage());
       await tester.pumpAndSettle();
@@ -80,9 +65,7 @@ void main() {
     });
 
     testWidgets('shows app bar with title', (tester) async {
-      when(
-        () => mockGetTodosUseCase.call(),
-      ).thenAnswer((_) async => Result.success(testTodos));
+      when(() => mockRepository.getTodos()).thenAnswer((_) async => testTodos);
 
       await tester.pumpWidget(createPage());
       await tester.pumpAndSettle();
@@ -91,9 +74,7 @@ void main() {
     });
 
     testWidgets('has floating action button', (tester) async {
-      when(
-        () => mockGetTodosUseCase.call(),
-      ).thenAnswer((_) async => Result.success(testTodos));
+      when(() => mockRepository.getTodos()).thenAnswer((_) async => testTodos);
 
       await tester.pumpWidget(createPage());
       await tester.pumpAndSettle();
@@ -103,9 +84,7 @@ void main() {
     });
 
     testWidgets('FAB opens AddTodoDialog', (tester) async {
-      when(
-        () => mockGetTodosUseCase.call(),
-      ).thenAnswer((_) async => Result.success(testTodos));
+      when(() => mockRepository.getTodos()).thenAnswer((_) async => testTodos);
 
       await tester.pumpWidget(createPage());
       await tester.pumpAndSettle();
@@ -117,11 +96,7 @@ void main() {
     });
 
     testWidgets('shows error view on failure', (tester) async {
-      when(() => mockGetTodosUseCase.call()).thenAnswer(
-        (_) async => const Result.failure(
-          ApiError(statusCode: 500, message: 'Server error'),
-        ),
-      );
+      when(() => mockRepository.getTodos()).thenThrow(Exception('Error'));
 
       await tester.pumpWidget(createPage());
       await tester.pumpAndSettle();
@@ -131,9 +106,7 @@ void main() {
     });
 
     testWidgets('shows stats bar', (tester) async {
-      when(
-        () => mockGetTodosUseCase.call(),
-      ).thenAnswer((_) async => Result.success(testTodos));
+      when(() => mockRepository.getTodos()).thenAnswer((_) async => testTodos);
 
       await tester.pumpWidget(createPage());
       await tester.pumpAndSettle();
@@ -143,17 +116,11 @@ void main() {
       expect(find.text('Completed'), findsOneWidget);
     });
 
-    testWidgets('submitting AddTodoDialog calls addTodo', (tester) async {
-      const newTodo = Todo(id: 3, userId: 1, title: 'New Todo');
-      when(
-        () => mockGetTodosUseCase.call(),
-      ).thenAnswer((_) async => Result.success(testTodos));
-      when(
-        () => mockCreateTodoUseCase.call(
-          title: any(named: 'title'),
-          userId: any(named: 'userId'),
-        ),
-      ).thenAnswer((_) async => const Result.success(newTodo));
+    testWidgets('submitting AddTodoDialog calls action.addTodo', (
+      tester,
+    ) async {
+      when(() => mockRepository.getTodos()).thenAnswer((_) async => testTodos);
+      when(() => mockAction.addTodo(any())).thenAnswer((_) async {});
 
       await tester.pumpWidget(createPage());
       await tester.pumpAndSettle();
@@ -168,18 +135,11 @@ void main() {
       await tester.tap(find.text('Add'));
       await tester.pumpAndSettle();
 
-      verify(
-        () => mockCreateTodoUseCase.call(
-          title: any(named: 'title'),
-          userId: any(named: 'userId'),
-        ),
-      ).called(1);
+      verify(() => mockAction.addTodo('New Todo')).called(1);
     });
 
     testWidgets('shows filter chips', (tester) async {
-      when(
-        () => mockGetTodosUseCase.call(),
-      ).thenAnswer((_) async => Result.success(testTodos));
+      when(() => mockRepository.getTodos()).thenAnswer((_) async => testTodos);
 
       await tester.pumpWidget(createPage());
       await tester.pumpAndSettle();

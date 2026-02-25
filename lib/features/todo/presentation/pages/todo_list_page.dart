@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../providers/todo_list_provider.dart';
+import '../actions/todo_list_action_provider.dart';
 import '../widgets/todo_list_view.dart';
 import '../widgets/todo_filter_chips.dart';
 import '../widgets/todo_stats_bar.dart';
@@ -34,7 +34,7 @@ class TodoListPage extends HookConsumerWidget {
       builder: (context) => const AddTodoDialog(),
     ).then((title) {
       if (title != null && title.isNotEmpty) {
-        ref.read(todoListProvider.notifier).addTodo(title);
+        ref.read(todoListActionProvider).addTodo(title);
       }
     });
   }

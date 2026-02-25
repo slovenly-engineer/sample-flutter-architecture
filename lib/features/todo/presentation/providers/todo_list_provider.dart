@@ -1,62 +1,42 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/models/result.dart';
 import '../../models/todo.dart';
 import '../../models/todo_filter.dart';
 import '../../domain/providers/todo_providers.dart';
 
 part 'todo_list_provider.g.dart';
 
+/// UI状態の保持・更新メソッド提供。
+/// ビジネスロジックは持たない。状態変更はAction経由で呼び出される。
+///
+/// 【設計判断】build()でのRepository直接依存について:
+/// Riverpodの `build` はProviderのライフサイクル（watch/invalidate）と密結合しており、
+/// UseCase経由にすると `Result` のアンラップが必要になり冗長になる。
+/// 初期データ取得は純粋なデータフェッチであり、ビジネスロジックを含まないため、
+/// Repository直接依存を許容事項とする。
 @riverpod
 class TodoListNotifier extends _$TodoListNotifier {
   @override
   Future<List<Todo>> build() async {
-    final useCase = ref.watch(getTodosUseCaseProvider);
-    final result = await useCase();
-
-    return switch (result) {
-      Success(:final data) => data,
-      Failure(:final error) => throw error,
-    };
+    final repository = ref.watch(todoRepositoryProvider);
+    return repository.getTodos();
   }
 
-  Future<void> toggleTodo(Todo todo) async {
-    final useCase = ref.read(toggleTodoUseCaseProvider);
-    final result = await useCase(todo);
-
-    switch (result) {
-      case Success(:final data):
-        state = AsyncData(
-          state.value!.map((t) => t.id == data.id ? data : t).toList(),
-        );
-      case Failure(:final error):
-        // Preserve current state, rethrow for UI to handle
-        throw error;
-    }
+  /// 指定のTodoを更新する（Action経由で呼び出される）
+  void updateTodo(Todo updated) {
+    state = AsyncData(
+      state.value!.map((t) => t.id == updated.id ? updated : t).toList(),
+    );
   }
 
-  Future<void> addTodo(String title) async {
-    final useCase = ref.read(createTodoUseCaseProvider);
-    final result = await useCase(title: title, userId: 1);
-
-    switch (result) {
-      case Success(:final data):
-        state = AsyncData([data, ...state.value!]);
-      case Failure(:final error):
-        throw error;
-    }
+  /// 新しいTodoをリスト先頭に追加する（Action経由で呼び出される）
+  void prependTodo(Todo todo) {
+    state = AsyncData([todo, ...state.value!]);
   }
 
-  Future<void> removeTodo(int id) async {
-    final useCase = ref.read(deleteTodoUseCaseProvider);
-    final result = await useCase(id);
-
-    switch (result) {
-      case Success():
-        state = AsyncData(state.value!.where((t) => t.id != id).toList());
-      case Failure(:final error):
-        throw error;
-    }
+  /// 指定IDのTodoをリストから削除する（Action経由で呼び出される）
+  void removeTodoById(int id) {
+    state = AsyncData(state.value!.where((t) => t.id != id).toList());
   }
 }
 

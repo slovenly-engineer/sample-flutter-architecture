@@ -1,16 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:sample_flutter_architecture/features/todo/models/todo_filter.dart';
+import 'package:sample_flutter_architecture/features/todo/presentation/actions/todo_list_action_provider.dart';
 import 'package:sample_flutter_architecture/features/todo/presentation/providers/todo_list_provider.dart';
 import 'package:sample_flutter_architecture/features/todo/presentation/widgets/todo_filter_chips.dart';
 
+import '../../../../helpers/mocks.dart';
 import '../../../../helpers/test_app.dart';
 
 void main() {
+  late MockTodoListAction mockAction;
+
+  setUp(() {
+    mockAction = MockTodoListAction();
+  });
+
+  setUpAll(() {
+    registerFallbackValue(TodoFilter.all);
+  });
+
   group('TodoFilterChips', () {
     testWidgets('displays all filter chips', (tester) async {
       await tester.pumpWidget(
-        createTestAppWithScaffold(const TodoFilterChips()),
+        createTestAppWithScaffold(
+          const TodoFilterChips(),
+          overrides: [todoListActionProvider.overrideWith((ref) => mockAction)],
+        ),
       );
 
       expect(find.text('ALL'), findsOneWidget);
@@ -20,7 +36,10 @@ void main() {
 
     testWidgets('ALL chip is selected by default', (tester) async {
       await tester.pumpWidget(
-        createTestAppWithScaffold(const TodoFilterChips()),
+        createTestAppWithScaffold(
+          const TodoFilterChips(),
+          overrides: [todoListActionProvider.overrideWith((ref) => mockAction)],
+        ),
       );
 
       final allChip = tester.widget<FilterChip>(
@@ -29,32 +48,34 @@ void main() {
       expect(allChip.selected, isTrue);
     });
 
-    testWidgets('tapping ACTIVE chip updates filter', (tester) async {
+    testWidgets('tapping ACTIVE chip calls action.setFilter', (tester) async {
       await tester.pumpWidget(
-        createTestAppWithScaffold(const TodoFilterChips()),
+        createTestAppWithScaffold(
+          const TodoFilterChips(),
+          overrides: [todoListActionProvider.overrideWith((ref) => mockAction)],
+        ),
       );
 
       await tester.tap(find.text('ACTIVE'));
       await tester.pump();
 
-      final activeChip = tester.widget<FilterChip>(
-        find.widgetWithText(FilterChip, 'ACTIVE'),
-      );
-      expect(activeChip.selected, isTrue);
+      verify(() => mockAction.setFilter(TodoFilter.active)).called(1);
     });
 
-    testWidgets('tapping COMPLETED chip updates filter', (tester) async {
+    testWidgets('tapping COMPLETED chip calls action.setFilter', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        createTestAppWithScaffold(const TodoFilterChips()),
+        createTestAppWithScaffold(
+          const TodoFilterChips(),
+          overrides: [todoListActionProvider.overrideWith((ref) => mockAction)],
+        ),
       );
 
       await tester.tap(find.text('COMPLETED'));
       await tester.pump();
 
-      final completedChip = tester.widget<FilterChip>(
-        find.widgetWithText(FilterChip, 'COMPLETED'),
-      );
-      expect(completedChip.selected, isTrue);
+      verify(() => mockAction.setFilter(TodoFilter.completed)).called(1);
     });
 
     testWidgets('reflects externally set filter', (tester) async {
@@ -62,6 +83,7 @@ void main() {
         createTestAppWithScaffold(
           const TodoFilterChips(),
           overrides: [
+            todoListActionProvider.overrideWith((ref) => mockAction),
             todoFilterProvider.overrideWith(
               () => _TestFilterNotifier(TodoFilter.completed),
             ),

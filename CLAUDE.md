@@ -52,33 +52,93 @@ bash scripts/check_coverage.sh coverage/lcov.info
 
 **Pattern**: Feature-First + Layered Architecture (Presentation → Domain → Data)
 
+詳細な設計書は [`docs/architecture.md`](docs/architecture.md) を参照。
+
+### フォルダ構成
+
 ```
 lib/
-├── core/                          # Shared infrastructure
-│   ├── models/                    # Result<T>, ApiError
-│   ├── network/                   # Dio client
-│   ├── ui/                        # Theme, shared components
-│   └── providers/                 # Global providers (Router)
+├── core/                          # 共有インフラストラクチャ
+│   ├── infrastructure/
+│   │   ├── network/              # HTTP通信（抽象 + Dio具体実装）
+│   │   ├── storage/              # ローカルDB（抽象 + ObjectBox具体実装）
+│   │   ├── navigation/           # 画面遷移（抽象 + go_router具体実装）
+│   │   └── ui/dialogs/           # ダイアログ/スナックバー（抽象 + Material具体実装）
+│   ├── auth/                     # 認証（横断的関心事）
+│   ├── app_settings/             # アプリ設定（横断的関心事）
+│   ├── initialization/           # アプリ起動処理
+│   ├── models/                   # 共通モデル（Result<T>, ApiError）
+│   ├── ui/
+│   │   ├── theme/                # カラー、フォント、スペーシング
+│   │   ├── components/           # アプリ固有デザイン適用Widget
+│   │   ├── layouts/              # レスポンシブ対応レイアウト
+│   │   └── blocks/               # 複合コンポーネント（Header等）
+│   ├── pages/                    # Feature非依存の画面（スプラッシュ、404等）
+│   ├── utils/
+│   └── providers/
+│
 └── features/
     └── {feature}/                 # Feature modules
-        ├── models/                # Domain models (freezed)
+        ├── models/                # Feature内共有モデル（freezed）
         ├── data/
-        │   ├── api/               # Retrofit API definitions
-        │   └── repositories/      # Repository implementations
+        │   ├── entities/         # DB Entity定義
+        │   └── repositories/     # Repository具体実装
         ├── domain/
-        │   ├── usecases/          # Business logic
-        │   └── providers/         # DI via Riverpod
+        │   ├── repositories/     # Repository抽象（interface）
+        │   ├── usecases/         # 純粋なビジネスロジック
+        │   └── providers/        # Domain層のProvider配線
+        ├── navigation/
+        │   └── {name}_routes.dart
         └── presentation/
-            ├── providers/         # UI state (Notifiers)
-            ├── pages/             # Screen widgets
-            └── widgets/           # Reusable UI components
+            ├── pages/             # 画面Widget
+            ├── widgets/           # 再利用可能UIコンポーネント
+            ├── providers/         # UI状態（Notifier）
+            └── actions/           # UIイベントの司令塔（Action）
 ```
+
+### 依存の流れ
+
+```
+Page / Widget
+  ├── ref.watch → Notifier（UI状態の購読）
+  └── ref.read → Action（UIイベントの司令塔）
+                   ├──→ UseCase（純粋なビジネスロジック）
+                   ├──→ Notifier（状態更新）
+                   ├──→ AppDialogService（フィードバック）
+                   └──→ AppNavigator（画面遷移）
+```
+
+### 各層の責務
+
+| 層 | 責務 | importできるもの |
+|---|---|---|
+| **Page / Widget** | 描画、イベント発火 | Notifier（watch）, Action（read） |
+| **Action** | UIイベントの司令塔。UseCaseを呼びつつNotifier更新・Dialog表示・画面遷移を組み立てる | Notifier, UseCase, DialogService, Navigator |
+| **Notifier** | UI状態の保持・更新メソッド提供 | Repository（buildでの初期データ取得のみ） |
+| **UseCase** | 純粋なビジネスロジック | なし（または他のUseCase） |
+| **Repository（抽象）** | データアクセスの定義 | なし |
+| **RepositoryImpl** | データアクセスの実装 | Core Infrastructureの抽象 |
+| **Core Infrastructure** | 外部パッケージのラップ | 外部パッケージ |
+
+### UseCaseとActionの区別
+
+- **UseCase**: 純粋なビジネスロジック。UIの概念を一切知らない
+- **Action**: UIイベントの司令塔。UseCaseを呼びつつ、Notifier更新・Dialog表示・画面遷移を組み立てる
+- 区別の基準: 「DialogやNavigatorに依存するか？」 → Yes: Action / No: UseCase
+
+### 重要なルール
+
+- **UIがNotifierを直接操作するのはアンチパターン**。状態変更は必ずAction経由
+- **Notifierの `build` メソッド**でのRepository依存（初期データ取得）は許容
+- **UseCase・Action・Repository**は純粋なDartクラス（Riverpod非依存）
+- **Hooks**はUIローカルな状態のみに使用（TextEditingController、AnimationController等）
 
 ## Key Patterns
 
-### State Management: Riverpod + Hooks
+### State Management: Riverpod + Hooks + Action
 - Use `@riverpod` annotation for code-generated providers
 - Widgets extend `HookConsumerWidget`
+- UIイベントはAction経由、UI状態はNotifier経由
 - Providers organized by layer: Data → Domain → Presentation
 
 ### Error Handling: Result<T>
@@ -89,39 +149,52 @@ sealed class Result<T> {
 }
 ```
 UseCases return `Result<T>` for type-safe error handling.
+ActionがResult<T>のSuccess/Failureを判定し、Notifier更新またはDialog表示を行う。
 
 ### Models: Freezed
 All domain models use `@freezed` for immutability, pattern matching, and JSON serialization.
 
-### API Layer: Retrofit + Dio
-- Centralized Dio client via `dioClientProvider`
-- API classes use Retrofit annotations (@GET, @POST, etc.)
-- Repository pattern wraps API calls and handles errors
+### Core Infrastructure: 外部パッケージの抽象化
+- `HttpClientService` → DioHttpClientService（API通信）
+- `LocalDbService` → ObjectBoxService（ローカルDB）
+- `AppNavigator` → GoRouterNavigator（画面遷移）
+- `AppDialogService` → MaterialDialogService（ダイアログ/スナックバー）
 
 ## Testing Strategy
 
-Three categories of tests:
+### テスト分離
 
-1. **Unit Tests**: UseCases, Models, Utils (pure Dart)
-2. **Widget/Provider Tests**: UI state and behavior
-3. **Golden Tests**: Visual regression with Alchemist
+| | Unit Test | Widget Test |
+|---|---|---|
+| テスト対象 | UseCase, Action, RepositoryImpl | Page, Widget |
+| Flutter依存 | **なし** | あり |
+| モック対象 | Repository, DialogService, Navigator, Notifier | Action, Notifier（状態） |
+| 検証内容 | 正しい指示が出るか | 正しく描画されるか |
+
+### テストヘルパー
 
 Test helpers in `test/helpers/`:
 - `createTestApp(widget, overrides: [])` - Basic test wrapper
 - `createTestAppWithScaffold(widget, overrides: [])` - With Scaffold
-- Mock classes via mocktail
+- Mock classes via mocktail in `test/helpers/mocks.dart`
 
+### Goldenテスト
+
+Visual regression with Alchemist.
 Golden tests use separate directories for CI (`goldens/ci/`) vs local (`goldens/`).
 
 ## Adding New Features
 
 1. Create `lib/features/{feature}/` with the layered structure
-2. Define Retrofit API in `data/api/`
-3. Create repository interface + implementation in `data/repositories/`
-4. Write UseCases in `domain/usecases/`
-5. Add Riverpod providers in `domain/providers/` and `presentation/providers/`
-6. Build UI in `presentation/{pages,widgets}/`
-7. Mirror structure in `test/` with >90% coverage
+2. Define Repository interface in `domain/repositories/`
+3. Create Repository implementation in `data/repositories/`
+4. Write UseCases in `domain/usecases/`（純粋なビジネスロジック）
+5. Add Riverpod providers in `domain/providers/`
+6. Create Notifier in `presentation/providers/`（UI状態の保持・更新）
+7. Create Action in `presentation/actions/`（UIイベントの司令塔）
+8. Build UI in `presentation/{pages,widgets}/`
+9. Define routes in `navigation/`
+10. Mirror structure in `test/` with >90% coverage
 
 ## CI Pipeline
 
@@ -158,16 +231,17 @@ These servers require the following runtimes (installed by the SessionStart hook
 
 レビュー時には以下の観点を重視してください：
 - **アーキテクチャ**: Feature-First + Layered Architecture に準拠しているか
+- **Action層**: UIイベントがAction経由で処理されているか（UIがNotifierを直接操作していないか）
 - **状態管理**: Riverpod + Hooks パターンが正しく使われているか
-- **エラーハンドリング**: `Result<T>` パターンで型安全にエラー処理されているか
+- **エラーハンドリング**: `Result<T>` パターンで型安全にエラー処理されているか（ActionがSuccess/Failureを適切に処理しているか）
 - **モデル**: Freezed による不変データモデルが適切に定義されているか
-- **API 層**: Retrofit + Dio のパターンに従っているか
-- **テスト**: テストカバレッジ 90% 以上を維持できるか
+- **Core Infrastructure**: 外部パッケージの抽象化パターンに従っているか
+- **テスト**: テストカバレッジ 90% 以上を維持できるか（Action Unit Test + Widget Test の分離）
 - **コーディング規約**: flutter_lints、`prefer_const_constructors`、`prefer_single_quotes` に準拠しているか
 
 ## Conventions
 
 - **Commits**: Conventional Commits format (`feat:`, `fix:`, `test:`, `ci:`)
 - **Linting**: flutter_lints with prefer_const_constructors, avoid_print, prefer_single_quotes
-- **Routing**: go_router with declarative routes in `router_provider.dart`
+- **Routing**: go_router with declarative routes. Feature routes in `features/{name}/navigation/`
 - **Theme**: Centralized in `core/ui/theme/` (AppTheme, AppColors, AppTypography, AppSpacing)

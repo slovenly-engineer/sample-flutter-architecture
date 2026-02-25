@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../../core/infrastructure/navigation/navigation_provider.dart';
 import '../../models/todo.dart';
-import '../providers/todo_list_provider.dart';
+import '../actions/todo_list_action_provider.dart';
 
 class TodoListTile extends HookConsumerWidget {
   const TodoListTile({super.key, required this.todo});
@@ -22,13 +21,13 @@ class TodoListTile extends HookConsumerWidget {
         child: const Icon(Icons.delete, color: Colors.white),
       ),
       onDismissed: (_) {
-        ref.read(todoListProvider.notifier).removeTodo(todo.id);
+        ref.read(todoListActionProvider).removeTodo(todo.id);
       },
       child: ListTile(
         leading: Checkbox(
           value: todo.completed,
           onChanged: (_) {
-            ref.read(todoListProvider.notifier).toggleTodo(todo);
+            ref.read(todoListActionProvider).toggleTodo(todo);
           },
         ),
         title: Text(
@@ -40,8 +39,7 @@ class TodoListTile extends HookConsumerWidget {
                 : null,
           ),
         ),
-        onTap: () =>
-            ref.read(appNavigatorProvider).goToTodoDetail('${todo.id}'),
+        onTap: () => ref.read(todoListActionProvider).goToTodoDetail(todo.id),
       ),
     );
   }

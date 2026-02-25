@@ -54,6 +54,16 @@ void main() {
       expect(stats.completed, 0);
       expect(stats.active, 0);
     });
+
+    test('equality works correctly', () {
+      const a = TodoStats(total: 5, completed: 3, active: 2);
+      const b = TodoStats(total: 5, completed: 3, active: 2);
+      const c = TodoStats(total: 5, completed: 2, active: 3);
+
+      expect(a, equals(b));
+      expect(a.hashCode, b.hashCode);
+      expect(a, isNot(equals(c)));
+    });
   });
 }
 
