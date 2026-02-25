@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../core/ui/theme/app_spacing.dart';
 import '../../models/todo_filter.dart';
+import '../actions/todo_list_action_provider.dart';
 import '../providers/todo_list_provider.dart';
 
 class TodoFilterChips extends HookConsumerWidget {
@@ -25,7 +26,7 @@ class TodoFilterChips extends HookConsumerWidget {
             label: Text(filter.name.toUpperCase()),
             selected: isSelected,
             onSelected: (_) {
-              ref.read(todoFilterProvider.notifier).setFilter(filter);
+              ref.read(todoListActionProvider).setFilter(filter);
             },
           );
         }).toList(),

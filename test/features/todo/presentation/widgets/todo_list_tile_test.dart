@@ -2,21 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:sample_flutter_architecture/core/infrastructure/navigation/navigation_provider.dart';
-import 'package:sample_flutter_architecture/core/models/result.dart';
 import 'package:sample_flutter_architecture/core/ui/theme/app_theme.dart';
-import 'package:sample_flutter_architecture/features/todo/domain/providers/todo_providers.dart';
 import 'package:sample_flutter_architecture/features/todo/models/todo.dart';
+import 'package:sample_flutter_architecture/features/todo/presentation/actions/todo_list_action_provider.dart';
 import 'package:sample_flutter_architecture/features/todo/presentation/widgets/todo_list_tile.dart';
 
 import '../../../../helpers/mocks.dart';
 
 void main() {
-  late MockGetTodosUseCase mockGetTodosUseCase;
-  late MockToggleTodoUseCase mockToggleTodoUseCase;
-  late MockCreateTodoUseCase mockCreateTodoUseCase;
-  late MockDeleteTodoUseCase mockDeleteTodoUseCase;
-  late MockAppNavigator mockAppNavigator;
+  late MockTodoListAction mockAction;
 
   const activeTodo = Todo(id: 1, userId: 1, title: 'Active Todo');
   const completedTodo = Todo(
@@ -27,15 +21,7 @@ void main() {
   );
 
   setUp(() {
-    mockGetTodosUseCase = MockGetTodosUseCase();
-    mockToggleTodoUseCase = MockToggleTodoUseCase();
-    mockCreateTodoUseCase = MockCreateTodoUseCase();
-    mockDeleteTodoUseCase = MockDeleteTodoUseCase();
-    mockAppNavigator = MockAppNavigator();
-
-    when(() => mockGetTodosUseCase.call()).thenAnswer(
-      (_) async => const Result.success([activeTodo, completedTodo]),
-    );
+    mockAction = MockTodoListAction();
   });
 
   setUpAll(() {
@@ -44,13 +30,7 @@ void main() {
 
   Widget createWidget(Todo todo) {
     return ProviderScope(
-      overrides: [
-        getTodosUseCaseProvider.overrideWith((ref) => mockGetTodosUseCase),
-        toggleTodoUseCaseProvider.overrideWith((ref) => mockToggleTodoUseCase),
-        createTodoUseCaseProvider.overrideWith((ref) => mockCreateTodoUseCase),
-        deleteTodoUseCaseProvider.overrideWith((ref) => mockDeleteTodoUseCase),
-        appNavigatorProvider.overrideWith((ref) => mockAppNavigator),
-      ],
+      overrides: [todoListActionProvider.overrideWith((ref) => mockAction)],
       child: MaterialApp(
         theme: AppTheme.light,
         home: Scaffold(
@@ -100,10 +80,8 @@ void main() {
       expect(text.style?.decoration, isNull);
     });
 
-    testWidgets('tapping checkbox calls toggleTodo', (tester) async {
-      when(() => mockToggleTodoUseCase.call(any())).thenAnswer(
-        (_) async => Result.success(activeTodo.copyWith(completed: true)),
-      );
+    testWidgets('tapping checkbox calls action.toggleTodo', (tester) async {
+      when(() => mockAction.toggleTodo(any())).thenAnswer((_) async {});
 
       await tester.pumpWidget(createWidget(activeTodo));
       await tester.pumpAndSettle();
@@ -111,23 +89,21 @@ void main() {
       await tester.tap(find.byType(Checkbox));
       await tester.pump();
 
-      verify(() => mockToggleTodoUseCase.call(any())).called(1);
+      verify(() => mockAction.toggleTodo(activeTodo)).called(1);
     });
 
-    testWidgets('tapping tile navigates to todo detail', (tester) async {
+    testWidgets('tapping tile calls action.goToTodoDetail', (tester) async {
       await tester.pumpWidget(createWidget(activeTodo));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Active Todo'));
       await tester.pump();
 
-      verify(() => mockAppNavigator.goToTodoDetail('1')).called(1);
+      verify(() => mockAction.goToTodoDetail(1)).called(1);
     });
 
-    testWidgets('swiping triggers removeTodo', (tester) async {
-      when(
-        () => mockDeleteTodoUseCase.call(1),
-      ).thenAnswer((_) async => const Result.success(null));
+    testWidgets('swiping calls action.removeTodo', (tester) async {
+      when(() => mockAction.removeTodo(any())).thenAnswer((_) async {});
 
       await tester.pumpWidget(createWidget(activeTodo));
       await tester.pumpAndSettle();
@@ -135,7 +111,7 @@ void main() {
       await tester.drag(find.byType(Dismissible), const Offset(-500, 0));
       await tester.pumpAndSettle();
 
-      verify(() => mockDeleteTodoUseCase.call(1)).called(1);
+      verify(() => mockAction.removeTodo(1)).called(1);
     });
   });
 }

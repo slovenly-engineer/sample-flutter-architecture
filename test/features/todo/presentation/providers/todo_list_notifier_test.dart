@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sample_flutter_architecture/core/models/api_error.dart';
-import 'package:sample_flutter_architecture/core/models/result.dart';
 import 'package:sample_flutter_architecture/features/todo/domain/providers/todo_providers.dart';
 import 'package:sample_flutter_architecture/features/todo/models/todo.dart';
 import 'package:sample_flutter_architecture/features/todo/models/todo_filter.dart';
@@ -11,10 +10,7 @@ import 'package:sample_flutter_architecture/features/todo/presentation/providers
 import '../../../../helpers/mocks.dart';
 
 void main() {
-  late MockGetTodosUseCase mockGetTodosUseCase;
-  late MockToggleTodoUseCase mockToggleTodoUseCase;
-  late MockCreateTodoUseCase mockCreateTodoUseCase;
-  late MockDeleteTodoUseCase mockDeleteTodoUseCase;
+  late MockTodoRepository mockRepository;
 
   final testTodos = [
     const Todo(id: 1, userId: 1, title: 'Todo 1'),
@@ -22,58 +18,40 @@ void main() {
   ];
 
   setUp(() {
-    mockGetTodosUseCase = MockGetTodosUseCase();
-    mockToggleTodoUseCase = MockToggleTodoUseCase();
-    mockCreateTodoUseCase = MockCreateTodoUseCase();
-    mockDeleteTodoUseCase = MockDeleteTodoUseCase();
-  });
-
-  setUpAll(() {
-    registerFallbackValue(const Todo(id: 0, userId: 0, title: ''));
+    mockRepository = MockTodoRepository();
   });
 
   ProviderContainer createContainer() {
     return ProviderContainer(
-      overrides: [
-        getTodosUseCaseProvider.overrideWith((ref) => mockGetTodosUseCase),
-        toggleTodoUseCaseProvider.overrideWith((ref) => mockToggleTodoUseCase),
-        createTodoUseCaseProvider.overrideWith((ref) => mockCreateTodoUseCase),
-        deleteTodoUseCaseProvider.overrideWith((ref) => mockDeleteTodoUseCase),
-      ],
+      overrides: [todoRepositoryProvider.overrideWith((ref) => mockRepository)],
     );
   }
 
   group('TodoListNotifier', () {
-    test('build fetches todos successfully', () async {
-      when(
-        () => mockGetTodosUseCase.call(),
-      ).thenAnswer((_) async => Result.success(testTodos));
+    test('build fetches todos from repository successfully', () async {
+      when(() => mockRepository.getTodos()).thenAnswer((_) async => testTodos);
 
       final container = createContainer();
       addTearDown(container.dispose);
 
-      // Trigger the provider
       final subscription = container.listen(todoListProvider, (_, _) {});
 
-      // Wait for async resolution
       await container.read(todoListProvider.future);
 
       final state = subscription.read();
       expect(state.value, testTodos);
     });
 
-    test('build throws on failure', () async {
-      when(() => mockGetTodosUseCase.call()).thenAnswer(
-        (_) async =>
-            const Result.failure(ApiError(statusCode: 500, message: 'Error')),
-      );
+    test('build throws on repository failure', () async {
+      when(
+        () => mockRepository.getTodos(),
+      ).thenThrow(const ApiError(statusCode: 500, message: 'Error'));
 
       final container = createContainer();
       addTearDown(container.dispose);
 
       final sub = container.listen(todoListProvider, (_, _) {});
 
-      // Wait for async resolution
       await pumpEventQueue();
 
       final state = sub.read();
@@ -83,148 +61,56 @@ void main() {
       sub.close();
     });
 
-    test('toggleTodo updates the todo in state', () async {
-      when(
-        () => mockGetTodosUseCase.call(),
-      ).thenAnswer((_) async => Result.success(testTodos));
+    test('updateTodo replaces the matching todo in state', () async {
+      when(() => mockRepository.getTodos()).thenAnswer((_) async => testTodos);
 
-      const toggledTodo = Todo(
+      final container = createContainer();
+      addTearDown(container.dispose);
+
+      await container.read(todoListProvider.future);
+
+      const updatedTodo = Todo(
         id: 1,
         userId: 1,
         title: 'Todo 1',
         completed: true,
       );
-      when(
-        () => mockToggleTodoUseCase.call(any()),
-      ).thenAnswer((_) async => const Result.success(toggledTodo));
-
-      final container = createContainer();
-      addTearDown(container.dispose);
-
-      await container.read(todoListProvider.future);
-
-      await container.read(todoListProvider.notifier).toggleTodo(testTodos[0]);
+      container.read(todoListProvider.notifier).updateTodo(updatedTodo);
 
       final state = await container.read(todoListProvider.future);
       expect(state.first.completed, true);
+      expect(state.first.id, 1);
     });
 
-    test('addTodo prepends the new todo', () async {
-      when(
-        () => mockGetTodosUseCase.call(),
-      ).thenAnswer((_) async => Result.success(testTodos));
-
-      const newTodo = Todo(id: 3, userId: 1, title: 'New Todo');
-      when(
-        () => mockCreateTodoUseCase.call(
-          title: any(named: 'title'),
-          userId: any(named: 'userId'),
-        ),
-      ).thenAnswer((_) async => const Result.success(newTodo));
+    test('prependTodo adds the new todo at the beginning', () async {
+      when(() => mockRepository.getTodos()).thenAnswer((_) async => testTodos);
 
       final container = createContainer();
       addTearDown(container.dispose);
 
       await container.read(todoListProvider.future);
 
-      await container.read(todoListProvider.notifier).addTodo('New Todo');
+      const newTodo = Todo(id: 3, userId: 1, title: 'New Todo');
+      container.read(todoListProvider.notifier).prependTodo(newTodo);
 
       final state = await container.read(todoListProvider.future);
       expect(state.length, 3);
       expect(state.first.title, 'New Todo');
     });
 
-    test('removeTodo removes the todo from state', () async {
-      when(
-        () => mockGetTodosUseCase.call(),
-      ).thenAnswer((_) async => Result.success(testTodos));
-
-      when(
-        () => mockDeleteTodoUseCase.call(any()),
-      ).thenAnswer((_) async => const Result.success(null));
+    test('removeTodoById removes the todo from state', () async {
+      when(() => mockRepository.getTodos()).thenAnswer((_) async => testTodos);
 
       final container = createContainer();
       addTearDown(container.dispose);
 
       await container.read(todoListProvider.future);
 
-      await container.read(todoListProvider.notifier).removeTodo(1);
+      container.read(todoListProvider.notifier).removeTodoById(1);
 
       final state = await container.read(todoListProvider.future);
       expect(state.length, 1);
       expect(state.first.id, 2);
-    });
-
-    test('toggleTodo throws on failure', () async {
-      when(
-        () => mockGetTodosUseCase.call(),
-      ).thenAnswer((_) async => Result.success(testTodos));
-
-      when(() => mockToggleTodoUseCase.call(any())).thenAnswer(
-        (_) async => const Result.failure(
-          ApiError(statusCode: 500, message: 'Toggle failed'),
-        ),
-      );
-
-      final container = createContainer();
-      addTearDown(container.dispose);
-
-      await container.read(todoListProvider.future);
-
-      expect(
-        () =>
-            container.read(todoListProvider.notifier).toggleTodo(testTodos[0]),
-        throwsA(isA<ApiError>()),
-      );
-    });
-
-    test('addTodo throws on failure', () async {
-      when(
-        () => mockGetTodosUseCase.call(),
-      ).thenAnswer((_) async => Result.success(testTodos));
-
-      when(
-        () => mockCreateTodoUseCase.call(
-          title: any(named: 'title'),
-          userId: any(named: 'userId'),
-        ),
-      ).thenAnswer(
-        (_) async => const Result.failure(
-          ApiError(statusCode: 500, message: 'Create failed'),
-        ),
-      );
-
-      final container = createContainer();
-      addTearDown(container.dispose);
-
-      await container.read(todoListProvider.future);
-
-      expect(
-        () => container.read(todoListProvider.notifier).addTodo('Fail Todo'),
-        throwsA(isA<ApiError>()),
-      );
-    });
-
-    test('removeTodo throws on failure', () async {
-      when(
-        () => mockGetTodosUseCase.call(),
-      ).thenAnswer((_) async => Result.success(testTodos));
-
-      when(() => mockDeleteTodoUseCase.call(any())).thenAnswer(
-        (_) async => const Result.failure(
-          ApiError(statusCode: 500, message: 'Delete failed'),
-        ),
-      );
-
-      final container = createContainer();
-      addTearDown(container.dispose);
-
-      await container.read(todoListProvider.future);
-
-      expect(
-        () => container.read(todoListProvider.notifier).removeTodo(1),
-        throwsA(isA<ApiError>()),
-      );
     });
   });
 
@@ -249,9 +135,7 @@ void main() {
 
   group('filteredTodos', () {
     test('returns all todos with TodoFilter.all', () async {
-      when(
-        () => mockGetTodosUseCase.call(),
-      ).thenAnswer((_) async => Result.success(testTodos));
+      when(() => mockRepository.getTodos()).thenAnswer((_) async => testTodos);
 
       final container = createContainer();
       addTearDown(container.dispose);
@@ -263,9 +147,7 @@ void main() {
     });
 
     test('returns only active todos with TodoFilter.active', () async {
-      when(
-        () => mockGetTodosUseCase.call(),
-      ).thenAnswer((_) async => Result.success(testTodos));
+      when(() => mockRepository.getTodos()).thenAnswer((_) async => testTodos);
 
       final container = createContainer();
       addTearDown(container.dispose);
@@ -280,9 +162,7 @@ void main() {
     });
 
     test('returns only completed todos with TodoFilter.completed', () async {
-      when(
-        () => mockGetTodosUseCase.call(),
-      ).thenAnswer((_) async => Result.success(testTodos));
+      when(() => mockRepository.getTodos()).thenAnswer((_) async => testTodos);
 
       final container = createContainer();
       addTearDown(container.dispose);
@@ -299,9 +179,7 @@ void main() {
     });
 
     test('returns empty when loading', () {
-      when(
-        () => mockGetTodosUseCase.call(),
-      ).thenAnswer((_) async => Result.success(testTodos));
+      when(() => mockRepository.getTodos()).thenAnswer((_) async => testTodos);
 
       final container = createContainer();
       addTearDown(container.dispose);
@@ -314,9 +192,7 @@ void main() {
 
   group('todoStats', () {
     test('returns correct stats', () async {
-      when(
-        () => mockGetTodosUseCase.call(),
-      ).thenAnswer((_) async => Result.success(testTodos));
+      when(() => mockRepository.getTodos()).thenAnswer((_) async => testTodos);
 
       final container = createContainer();
       addTearDown(container.dispose);
@@ -330,9 +206,7 @@ void main() {
     });
 
     test('returns zeros when loading', () {
-      when(
-        () => mockGetTodosUseCase.call(),
-      ).thenAnswer((_) async => Result.success(testTodos));
+      when(() => mockRepository.getTodos()).thenAnswer((_) async => testTodos);
 
       final container = createContainer();
       addTearDown(container.dispose);
