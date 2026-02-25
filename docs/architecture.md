@@ -52,7 +52,6 @@ Page / Widget
   └── ref.read → Action（UIイベントの司令塔）
                    │
                    ├──→ UseCase（純粋なビジネスロジック）
-                   ├──→ Repository抽象（データ操作）
                    ├──→ AppDialogService（フィードバック）
                    └──→ AppNavigator（画面遷移）
                             │
@@ -77,7 +76,7 @@ Page / Widget
 | 層 | 責務 | importできるもの |
 |---|---|---|
 | **Page / Widget** | 描画、イベント発火 | Notifier（watch）, Action（read） |
-| **Action** | UIイベントの司令塔。各所に指示を出す | Notifier, UseCase, Repository, DialogService, Navigator |
+| **Action** | UIイベントの司令塔。各所に指示を出す | Notifier, UseCase, DialogService, Navigator |
 | **Notifier** | UI状態の保持・更新メソッド提供 | Repository（buildでの初期データ取得のみ・許容事項） |
 | **UseCase** | 純粋なビジネスロジック | なし（または他のUseCase） |
 | **Repository（抽象）** | データアクセスの定義 | なし |

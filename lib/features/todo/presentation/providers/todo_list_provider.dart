@@ -7,8 +7,13 @@ import '../../domain/providers/todo_providers.dart';
 part 'todo_list_provider.g.dart';
 
 /// UI状態の保持・更新メソッド提供。
-/// build()でのRepository依存（初期データ取得）のみ許容。
 /// ビジネスロジックは持たない。状態変更はAction経由で呼び出される。
+///
+/// 【設計判断】build()でのRepository直接依存について:
+/// Riverpodの `build` はProviderのライフサイクル（watch/invalidate）と密結合しており、
+/// UseCase経由にすると `Result` のアンラップが必要になり冗長になる。
+/// 初期データ取得は純粋なデータフェッチであり、ビジネスロジックを含まないため、
+/// Repository直接依存を許容事項とする。
 @riverpod
 class TodoListNotifier extends _$TodoListNotifier {
   @override
